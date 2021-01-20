@@ -1,0 +1,45 @@
+<Window x:Class="MainWpfApp.AddItemDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:MainWpfApp"
+        mc:Ignorable="d"
+        Title="新建项目" Height="460" Width="400">
+    <Grid>
+        <StackPanel x:Name="Bolt_Para" Margin="10,40,10,10">
+            <Canvas Width="280" Height="40" Margin="0,5,0,0">
+                <TextBlock Text="项目编号  " FontWeight="Bold" FontSize="20" Padding="0,6" HorizontalAlignment="Left" Canvas.Left="0" Width="100" Height="40"/>
+                <TextBox x:Name="BoltId" Width="180" Text="{Binding Path=Bolt_id, Mode=TwoWay}"  HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Background="{x:Null}" BorderBrush="#FF0B43EB" BorderThickness="2" FontWeight="Bold" Padding="0,6" Margin="0" HorizontalAlignment="Right" Canvas.Left="100" Height="36"/>
+            </Canvas>
+            <Canvas Width="280" Height="40" Margin="0,5,0,0">
+                <TextBlock Text="螺栓材质  " FontWeight="Bold" FontSize="20" Padding="0,6" HorizontalAlignment="Left" Canvas.Left="0" Width="100" Height="40"/>
+                <TextBox x:Name="Materials" Width="180" Text="{Binding Path=Standards, Mode=TwoWay}"  HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Background="{x:Null}" BorderBrush="#FF0B43EB" BorderThickness="2" FontWeight="Bold" Padding="0,6" Margin="0" HorizontalAlignment="Right" Canvas.Left="100" Height="36"/>
+            </Canvas>
+
+            <Canvas Width="280" Height="40" Margin="0,5,0,0">
+                <TextBlock Text="螺栓规格  " FontWeight="Bold" FontSize="20" Padding="0,6" HorizontalAlignment="Left" Canvas.Left="0" Width="100" Height="40"/>
+                <TextBox x:Name="Standards" Width="180" Text="{Binding Path=Standards, Mode=TwoWay}"  HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Background="{x:Null}" BorderBrush="#FF0B43EB" BorderThickness="2" FontWeight="Bold" Padding="0,6" Margin="0" HorizontalAlignment="Right" Canvas.Left="100" Height="36"/>
+            </Canvas>
+
+            <Canvas Width="280" Height="40" Margin="0,5,0,0">
+                <TextBlock Text="螺栓长度(mm)  " FontWeight="Bold" FontSize="20" Padding="0,6" HorizontalAlignment="Left" Canvas.Left="0" Width="150" Height="40"/>
+                <TextBox x:Name="BoltLength" Width="130" Text="{Binding Path=Bolt_length, Mode=TwoWay}"  HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Background="{x:Null}" BorderBrush="#FF0B43EB" BorderThickness="2" FontWeight="Bold" Padding="0,6" Margin="0" HorizontalAlignment="Right" Canvas.Left="150" Height="36"/>
+            </Canvas>
+            <Canvas Width="280" Margin="0,5,0,0" Height="40">
+                <TextBlock Text="夹持长度(mm)  " FontWeight="Bold" FontSize="20" Padding="0,6" HorizontalAlignment="Left" Canvas.Left="0" Width="150" Height="40"/>
+                <TextBox x:Name="ClampLength" Text="{Binding Path=Clamp_length, Mode=TwoWay}" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Background="{x:Null}" BorderBrush="#FF0B43EB" BorderThickness="2" FontWeight="Bold" Width="130" Padding="0,6" Margin="0" HorizontalAlignment="Right" Canvas.Left="150" Height="36"/>
+            </Canvas>
+            <Canvas Width="280" Height="40" Margin="0,5,0,0">
+                <TextBlock Text="螺栓公称直径(mm)  " FontWeight="Bold" FontSize="20" Padding="0,6" HorizontalAlignment="Left" Canvas.Left="0" Width="180" Height="40"/>
+                <TextBox x:Name="NominalDiameter" Text="{Binding Path=Nominal_diameter, Mode=TwoWay}" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Background="{x:Null}" BorderBrush="#FF0B43EB" BorderThickness="2" FontWeight="Bold" Width="100" Padding="0,6" Margin="0" HorizontalAlignment="Right" Canvas.Left="180" Height="36"/>
+            </Canvas>
+            <Canvas Width="280" Margin="0,5,0,0" Height="40">
+                <TextBlock Text="应力系数(MPa)  " FontWeight="Bold" FontSize="20" Padding="0,6" HorizontalAlignment="Left" Canvas.Left="0" Width="150" Height="40"/>
+                <TextBox x:Name="StressCoefficient" Text="{Binding Path=Stress_coefficient, Mode=TwoWay}" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Background="{x:Null}" BorderBrush="#FF0B43EB" BorderThickness="2" FontWeight="Bold" Width="130" Padding="0,6" Margin="0" HorizontalAlignment="Right" Canvas.Left="150" Height="36"/>
+            </Canvas>
+            <Button x:Name="AddItemOk" Foreground="#FFFFFBFB" Background="#0000ff" Content="确定" Width="140" FontSize="20" Margin="0,20,0,0" Click="AddItemOk_Click"></Button>
+        </StackPanel>
+
+    </Grid>
+</Window>

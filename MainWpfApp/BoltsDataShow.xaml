@@ -1,0 +1,38 @@
+﻿<Window x:Class="MainWpfApp.Window1"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:MainWpfApp"
+        mc:Ignorable="d"
+        Title="螺栓数据库" Height="450" Width="800">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"></RowDefinition>
+            <RowDefinition Height="9*"></RowDefinition>
+        </Grid.RowDefinitions>
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"></ColumnDefinition>
+            <ColumnDefinition Width="7*"></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+
+        <DataGrid Name="BoltsTable" Grid.Row="1" Grid.Column="1" AutoGenerateColumns="False">
+            <DataGrid.Columns>
+                <DataGridTextColumn Width="*" Binding="{Binding Proj_id}">
+                </DataGridTextColumn>
+
+                <DataGridTextColumn Width="*" Binding="{Binding Material}">
+                </DataGridTextColumn>
+                
+                <DataGridTextColumn Width="*" Binding="{Binding Standards}">
+                </DataGridTextColumn>
+
+                <DataGridTextColumn Width="*" Binding="{Binding Standards}">
+                </DataGridTextColumn>
+                
+            </DataGrid.Columns>
+        </DataGrid>
+        
+    </Grid>
+</Window>

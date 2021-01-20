@@ -1,0 +1,90 @@
+﻿using MainWpfApp.ViewModels;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.IO;
+using System.Linq;
+using System.Windows.Forms;
+
+namespace MainWpfApp.Util {
+    public class InitUtil : BindEx {
+        public static BoltModel CurrentBolt { get; internal set; }
+
+        public static void SaveProjFun() {
+
+        }
+
+        public static void SaveProjAsFun() {
+
+        }
+       
+        public static void AddProjFun() {
+            SaveFileDialog sfd = OpenSaveFileWin();
+            if (sfd != null)
+            {
+                //获得保存文件的路径
+                MainWindow.Proj_path = sfd.FileName; //保存
+                using (FileStream fsWrite = new FileStream(MainWindow.Proj_path, FileMode.OpenOrCreate, FileAccess.Write))
+                {
+
+                }
+            }
+        }
+
+        public static void OpenProjFun() {
+            System.Windows.Forms.OpenFileDialog openFileDialog1 = new System.Windows.Forms.OpenFileDialog
+            {
+                InitialDirectory = "c:\\",
+                Filter = "db files (*.db)|*.db",
+                FilterIndex = 1,
+                RestoreDirectory = true
+            };
+            if (openFileDialog1.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            {
+                // MessageBox.Show(openFileDialog1.FileName);
+                MainWindow.Proj_path = openFileDialog1.FileName;
+            }
+        }
+
+        private static bool OpenFileWindow() {
+            System.Windows.Forms.OpenFileDialog openFileDialog1 = new System.Windows.Forms.OpenFileDialog
+            {
+                InitialDirectory = "c:\\",
+                Filter = "db files (*.db)|*.db|All files (*.*)|*.*",
+                FilterIndex = 1,
+                RestoreDirectory = true
+            };
+            return openFileDialog1.ShowDialog() == System.Windows.Forms.DialogResult.OK;
+        }
+
+        private static SaveFileDialog OpenSaveFileWin() {
+            SaveFileDialog sfd = new SaveFileDialog
+            {
+                //设置保存文件对话框的标题
+                Title = "请选择要保存的文件路径",
+                Filter = "db files (*.db)|*.db",
+                //保存对话框是否记忆上次打开的目录 
+                RestoreDirectory = true,
+            };
+            if (sfd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            {
+                return sfd;
+            }
+            else
+            {
+                return null;
+            }
+        }
+    }
+
+    /// <summary>
+    /// 继承该类后会绑定双向事件通知
+    /// </summary>
+    public class BindEx : INotifyPropertyChanged {
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        protected internal virtual void OnPropertyChanged(string propertyName) {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+    }
+}
