@@ -1,18 +1,11 @@
 ﻿using MainWpfApp.ViewModels;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
-using System.Linq;
 using System.Windows.Forms;
 
 namespace MainWpfApp.Util {
     public class InitUtil : BindEx {
         public static BoltModel CurrentBolt { get; internal set; }
-
-        public static void SaveProjFun() {
-
-        }
 
         public static void SaveProjAsFun() {
 

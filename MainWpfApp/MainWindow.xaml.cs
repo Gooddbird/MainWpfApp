@@ -16,12 +16,10 @@ namespace MainWpfApp {
             CurrentBolt = new BoltModel();
             BoltModel t = new BoltModel();
             _BoltList.Add(t);
-            //BoltList = new ObservableCollection<BoltModel>(_BoltList);
             Bolt_Para.DataContext = CurrentBolt;
             BuildBoltComboList(-1);
         }
 
-        
 
         /// <summary>
         /// 按键监听
@@ -36,8 +34,15 @@ namespace MainWpfApp {
             }
             if (Keyboard.IsKeyDown(Key.LeftCtrl) && Keyboard.IsKeyDown(Key.N))
             {
+                // 新建项目
                 AddItemFun();
             }
+            if (Keyboard.IsKeyDown(Key.LeftCtrl) && Keyboard.IsKeyDown(Key.S))
+            {
+                // 保存工程
+                SaveProjFun();
+            }
+
         }
 
         /// <summary>
@@ -67,13 +72,7 @@ namespace MainWpfApp {
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void SaveProj_Click(object sender, RoutedEventArgs e) {
-            try
-            {
-                db.Update(CurrentBolt, typeof(BoltModel));
-            }
-            catch (SQLiteException) {
-                MessageBox.Show("保存失败！");
-            }
+            SaveProjFun(); 
         }
 
         /// <summary>
@@ -110,14 +109,29 @@ namespace MainWpfApp {
                 MessageBox.Show("请先打开工程！");
                 return;
             }
-            // Crtl + N 新建螺栓项目
+            // 打开新建螺栓项目窗口
             AddItemDialog dialog = new AddItemDialog();
             dialog.ShowDialog();
             if (dialog.isSuccessd == true) {
+                // 添加成功则更新索引到新增的螺栓对象
                 _BoltList = db.Bolts.ToList();
                 BuildBoltComboList(_BoltList.Count - 1);
             }
 
+        }
+
+        private void SaveProjFun() {
+            try
+            {
+                int i = BoltComboList.SelectedIndex;
+                db.Update(CurrentBolt, typeof(BoltModel));
+                _BoltList = db.Bolts.ToList();
+                BuildBoltComboList(i);
+            }
+            catch (SQLiteException)
+            {
+                MessageBox.Show("保存失败！");
+            }
         }
 
         public static string Proj_path { get; set; }    // 工程db路径
@@ -126,7 +140,7 @@ namespace MainWpfApp {
 
         public BoltModel CurrentBolt { get; set; }      // 当前选择螺栓项目
 
-        public List<BoltModel> _BoltList = new List<BoltModel>();   // 螺栓列表
+        public static List<BoltModel> _BoltList = new List<BoltModel>();   // 螺栓列表
 
         public event PropertyChangedEventHandler PropertyChanged;
  
@@ -156,6 +170,9 @@ namespace MainWpfApp {
             m1.Nominal_diameter = m2.Nominal_diameter;
         }
 
+        /// <summary>
+        /// 主面板参数初始化
+        /// </summary>
         public void SetPara() {
             try
             {

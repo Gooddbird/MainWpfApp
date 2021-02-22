@@ -17,20 +17,61 @@
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"></ColumnDefinition>
             <ColumnDefinition Width="7*"></ColumnDefinition>
+            <ColumnDefinition Width="0.5*"></ColumnDefinition>
         </Grid.ColumnDefinitions>
 
-        <DataGrid Name="BoltsTable" Grid.Row="1" Grid.Column="1" AutoGenerateColumns="False">
+        <DataGrid Name="BoltsTable" Grid.Row="1" Grid.Column="1" AutoGenerateColumns="False" FontSize="18">
+            <DataGrid.ColumnHeaderStyle>
+                <!--样式类型：DataGridColumnHeader（数据网格列标题）-->
+                <Style TargetType="{x:Type DataGridColumnHeader}">
+                    <Setter Property="HorizontalContentAlignment" Value="Center"></Setter>
+                    <Setter Property="VerticalContentAlignment" Value="Center"></Setter>
+                    <Setter Property="BorderThickness" Value="1"></Setter>
+                    <Setter Property="Height" Value="60"></Setter>
+                    <Setter Property="Background" Value="#0099FF"/>
+                    <Setter Property="Foreground" Value="White"></Setter>
+                    <!--设置边框笔刷（BorderBrush）-->
+                    <Setter Property="BorderBrush">
+                        <!--值-->
+                        <Setter.Value>
+                            <!--色刷，Opacity：透明度-->
+                            <SolidColorBrush Color="#333" Opacity="0.1"></SolidColorBrush>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+            </DataGrid.ColumnHeaderStyle>
+            <DataGrid.CellStyle>
+                <Style TargetType="DataGridCell">
+                    <Setter Property="HorizontalContentAlignment" Value="Center"></Setter>
+                    <Setter Property="VerticalContentAlignment" Value="Bottom"></Setter>
+                    <Setter Property="Height" Value="60"></Setter>
+                    <Style.Triggers>
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter Property="Background" Value="SeaGreen"/>
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+            </DataGrid.CellStyle>
             <DataGrid.Columns>
-                <DataGridTextColumn Width="*" Binding="{Binding Proj_id}">
+                <DataGridTextColumn Header="项目编号" Width="1.5*" Binding="{Binding Bolt_id}" FontSize="18">
                 </DataGridTextColumn>
 
-                <DataGridTextColumn Width="*" Binding="{Binding Material}">
+                <DataGridTextColumn Header="材质" Width="*" Binding="{Binding Material}" FontSize="18">
                 </DataGridTextColumn>
 
-                <DataGridTextColumn Width="*" Binding="{Binding Standards}">
+                <DataGridTextColumn Header="螺栓规格" Width="*" Binding="{Binding Standards}" FontSize="18">
                 </DataGridTextColumn>
 
-                <DataGridTextColumn Width="*" Binding="{Binding Standards}">
+                <DataGridTextColumn Header="应力系数" Width="*" Binding="{Binding Stress_coefficient}" FontSize="18">
+                </DataGridTextColumn>
+
+                <DataGridTextColumn Header="螺栓长度&#13;  (mm)" Width="1.5*" Binding="{Binding Bolt_length}" FontSize="18">
+                </DataGridTextColumn>
+
+                <DataGridTextColumn Header="夹持长度&#13;  (mm)" Width="1.5*" Binding="{Binding Clamp_length}" FontSize="18">
+                </DataGridTextColumn>
+
+                <DataGridTextColumn Header="公称直径&#13;  (mm)" Width="1.5*" Binding="{Binding Nominal_diameter}" FontSize="18">
                 </DataGridTextColumn>
 
             </DataGrid.Columns>

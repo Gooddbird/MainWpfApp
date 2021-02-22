@@ -20,6 +20,7 @@ namespace MainWpfApp {
     public partial class BoltDataShowPage : Page {
         public BoltDataShowPage() {
             InitializeComponent();
+            BoltsTable.ItemsSource = MainWindow._BoltList;
         }
     }
 }
