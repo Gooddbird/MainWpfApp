@@ -144,22 +144,6 @@ namespace MainWpfApp {
 
         public event PropertyChangedEventHandler PropertyChanged;
  
-        //public ObservableCollection<BoltModel> BoltList {
-        //    get {
-        //        ObservableCollection<BoltModel> tmp = new ObservableCollection<BoltModel>();
-        //        _BoltList.ForEach(item =>
-        //        {
-        //            tmp.Add(item);
-        //        });
-        //        return tmp;
-        //        //return new ObservableCollection<BoltModel>(_BoltList);
-        //    }
-        //    set {
-        //        _BoltList = value.ToList();
-        //        this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("BoltList")); 
-        //    }
-        //}
-
         public static void CopyBoltPara(BoltModel m1, BoltModel m2) {
             m1.Bolt_id = m2.Bolt_id;
             m1.Material = m2.Material;
