@@ -1,17 +1,9 @@
-﻿using System;
+﻿using MainWpfApp.ViewModels;
+using SQLite;
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace MainWpfApp {
     /// <summary>
@@ -20,7 +12,58 @@ namespace MainWpfApp {
     public partial class BoltDataShowPage : Page {
         public BoltDataShowPage() {
             InitializeComponent();
-            BoltsTable.ItemsSource = MainWindow._BoltList;
+            BoltList = MainWindow.db.Bolts.ToList();
+            BoltsTable.ItemsSource = BoltList; 
+        }
+        public List<BoltModel> BoltList = new List<BoltModel>();        // 当前螺栓列表 绑定前端datagrid控件 随时变换
+
+        /// <summary>
+        /// 返回按钮点击事件
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void BackBtn_Click(object sender, RoutedEventArgs e) {
+
+            
+            Window win = (Window)this.Parent;
+            win.Close();
+        }
+
+        private void SaveBtn_Click(object sender, RoutedEventArgs e) {
+            try {
+                // 删除
+                foreach (BoltModel t in GetDelBolts(BoltList, MainWindow.db.Bolts.ToList())) {
+                    MainWindow.db.Delete(t);
+                }
+
+                // 新增或修改
+                foreach (BoltModel t in BoltList) {
+                    MainWindow.db.InsertOrReplace(t);
+                }
+                MainWindow._BoltList = MainWindow.db.Bolts.ToList();
+                var win = (MainWindow)Application.Current.MainWindow;
+                win.BuildBoltComboList(0);
+            }
+            catch (SQLiteException) {
+                MainWindow.db.Rollback();
+                MessageBox.Show("更新失败，请重试！");
+            }
+        }
+
+        /// <summary>
+        /// 找出list1中不存在而list2中存在的元素 即待删除的元素
+        /// </summary>
+        /// <param name="list1"></param>
+        /// <param name="list2"></param>
+        /// <returns></returns>
+        private List<BoltModel> GetDelBolts(List<BoltModel> list1, List<BoltModel> list2) {
+            List<BoltModel> re = new List<BoltModel>();
+            foreach (BoltModel tmp in list2){
+                if (list1.Contains(tmp) == false) {
+                    re.Add(tmp); 
+                }
+            }
+            return re;
         }
     }
 }

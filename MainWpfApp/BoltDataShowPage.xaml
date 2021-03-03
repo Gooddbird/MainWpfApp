@@ -7,7 +7,7 @@
       mc:Ignorable="d" 
       d:DesignHeight="450" d:DesignWidth="800"
       Title="螺栓数据库" Background="White" Foreground="Black" WindowTitle="">
-    
+
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*"></RowDefinition>
@@ -76,6 +76,10 @@
 
             </DataGrid.Columns>
         </DataGrid>
-
+        <StackPanel Grid.Column="0" Grid.Row="1">
+            <Button x:Name="BackBtn" Background="#70AD47" Margin="0,0,0,5" Width="80" Content="返回" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="18" Foreground ="#FFF7F4F4" Click="BackBtn_Click"/>
+            <Button x:Name="SaveBtn" Background="#70AD47" Width="80" Content="保存" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="18" Foreground ="#FFF7F4F4" Margin="0, 5, 0, 5" Click="SaveBtn_Click"/>
+        </StackPanel>
+        <TextBlock Grid.Column="1" Text="螺栓数据库" FontSize="36" HorizontalAlignment="Center" VerticalAlignment="Center"></TextBlock>
     </Grid>
 </Page>

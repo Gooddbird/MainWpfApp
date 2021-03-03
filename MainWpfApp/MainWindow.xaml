@@ -9,7 +9,9 @@
         xmlns:Util="clr-namespace:MainWpfApp.Util" x:Class="MainWpfApp.MainWindow"
         KeyDown="Window_KeyDown"
         mc:Ignorable="d" Height="780" Width="1490" Title="双波法螺栓预紧力测定 (Designed by ikerli)" Topmost="True">
-    <Grid>
+
+    <Grid x:Name="MainGrid">
+
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="4.5*"/>
             <ColumnDefinition Width="4.5*"/>
@@ -37,6 +39,7 @@
                 <MenuItem x:Name="OpenData" Header="数据库" FontSize="16" Click="OpenData_Click"/>
                 <MenuItem Header="帮助" FontSize="16"/>
             </Menu>
+            
         </Canvas>
 
         <!--横波波形图-->
@@ -181,4 +184,6 @@
             </StackPanel>
         </StackPanel>
     </Grid>
+ 
 </Window>
+

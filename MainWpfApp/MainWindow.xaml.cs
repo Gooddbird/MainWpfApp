@@ -1,9 +1,12 @@
 ﻿using MainWpfApp.ViewModels;
 using SQLite;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Navigation;
 
 namespace MainWpfApp {
     /// <summary>
@@ -14,10 +17,11 @@ namespace MainWpfApp {
             InitializeComponent();
             BoltComboList.ItemsSource = null;
             CurrentBolt = new BoltModel();
-            BoltModel t = new BoltModel();
-            _BoltList.Add(t);
+            //BoltModel t = new BoltModel();
+            //_BoltList.Add(t);
             Bolt_Para.DataContext = CurrentBolt;
             BuildBoltComboList(-1);
+            Application.Current.MainWindow = this;
         }
 
 
@@ -51,10 +55,12 @@ namespace MainWpfApp {
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void OpenData_Click(object sender, RoutedEventArgs e) {
-            //Window1 win = new Window1();
-            //win.Show();
-            BoltDataShowPage page = new BoltDataShowPage();
-            Content = page;
+            NavigationWindow window = new NavigationWindow
+            {
+                Source = new Uri("BoltDataShowPage.xaml", UriKind.Relative),
+                Owner = this
+            };
+            window.ShowDialog();
         }
         
         /// <summary>
@@ -130,13 +136,14 @@ namespace MainWpfApp {
             }
             catch (SQLiteException)
             {
+                db.Rollback();
                 MessageBox.Show("保存失败！");
             }
         }
 
         public static string Proj_path { get; set; }    // 工程db路径
 
-        private DbConnection db;                        // 工程db连接对象
+        public static DbConnection db;                        // 工程db连接对象
 
         public BoltModel CurrentBolt { get; set; }      // 当前选择螺栓项目
 
