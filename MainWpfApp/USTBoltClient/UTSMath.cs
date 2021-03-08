@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 
-    class UTSMath
+public class UTSMath
     {
 
         /**************************参数***********************************/

@@ -4,13 +4,15 @@ using System.Net.Sockets;
 using System.Threading;
 
 
-    class TcpClient
+public class TcpClient
     {
         private Socket socketsend;
         private Thread tcpClientThread;
         NetworkStream clientStream;
 
-        public String ipStr = "192.168.1.160";  //服务器ip
+        //public String ipStr = "192.168.1.160";  //服务器ip
+
+        public String ipStr = "192.168.31.157";  //tcpserver ip 调式用 
         //public String ipStr = "192.168.31.235";  //服务器ip
         public String portStr = "5000";  //端口号
 

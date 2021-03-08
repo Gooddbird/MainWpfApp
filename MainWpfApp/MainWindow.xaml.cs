@@ -1,8 +1,13 @@
 ﻿using MainWpfApp.ViewModels;
+using OxyPlot;
+using OxyPlot.Axes;
+using OxyPlot.Series;
 using SQLite;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -17,11 +22,11 @@ namespace MainWpfApp {
             InitializeComponent();
             BoltComboList.ItemsSource = null;
             CurrentBolt = new BoltModel();
-            //BoltModel t = new BoltModel();
-            //_BoltList.Add(t);
             Bolt_Para.DataContext = CurrentBolt;
             BuildBoltComboList(-1);
             Application.Current.MainWindow = this;
+            Init();
+            InitWave();
         }
 
 
@@ -55,6 +60,10 @@ namespace MainWpfApp {
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void OpenData_Click(object sender, RoutedEventArgs e) {
+            if (Proj_path == null) {
+                MessageBox.Show("请先打开工程！");
+                return;
+            }
             NavigationWindow window = new NavigationWindow
             {
                 Source = new Uri("BoltDataShowPage.xaml", UriKind.Relative),
@@ -110,6 +119,9 @@ namespace MainWpfApp {
             Util.InitUtil.SaveProjAsFun();
         }
 
+        /// <summary>
+        /// 添加螺栓项目(此处知识预先添加 实际要点击保存后才会插入到db)
+        /// </summary>
         private void AddItemFun() {
             if (Proj_path == null) {
                 MessageBox.Show("请先打开工程！");
@@ -126,6 +138,9 @@ namespace MainWpfApp {
 
         }
 
+        /// <summary>
+        /// 保存功能 将数据保存至db文件
+        /// </summary>
         private void SaveProjFun() {
             try
             {
@@ -149,8 +164,18 @@ namespace MainWpfApp {
 
         public static List<BoltModel> _BoltList = new List<BoltModel>();   // 螺栓列表
 
+        public WavePlotModel wavePlotModel { get; set; }
+
+        public USTBolt ustBolt = new USTBolt(); 
+
         public event PropertyChangedEventHandler PropertyChanged;
  
+        
+        /// <summary>
+        /// copy 螺栓参数 触发修改事件
+        /// </summary>
+        /// <param name="m1"></param>
+        /// <param name="m2"></param>
         public static void CopyBoltPara(BoltModel m1, BoltModel m2) {
             m1.Bolt_id = m2.Bolt_id;
             m1.Material = m2.Material;
@@ -160,9 +185,10 @@ namespace MainWpfApp {
             m1.Clamp_length = m2.Clamp_length;
             m1.Nominal_diameter = m2.Nominal_diameter;
         }
+        
 
         /// <summary>
-        /// 主面板参数初始化
+        /// 连接db 设置螺栓初始参数
         /// </summary>
         public void SetPara() {
             try
@@ -199,6 +225,11 @@ namespace MainWpfApp {
             CopyBoltPara(CurrentBolt, tmp);
         }
 
+        /// <summary>
+        /// 下拉框选择项改变事件 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void BoltComboList_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e) {
             int index = BoltComboList.SelectedIndex;
             BoltModel tmp;
@@ -210,6 +241,55 @@ namespace MainWpfApp {
                 tmp = _BoltList[index]; 
             }
             CopyBoltPara(CurrentBolt, tmp);
+        }
+        
+        /// <summary>
+        /// 初始化波形 绘制零应力波形
+        /// </summary>
+        private void InitWave() {
+            wavePlotModel = new WavePlotModel();
+            wavePlotModel.Init();
+        }
+
+        
+        private void Init() {
+            /*************初始化**************/
+            ustBolt.USTBDataInit();
+            /*************连接板卡**************/
+            while (true)
+            {
+                ustBolt.tcpConnect();
+                if (ustBolt.tcpConnFlag == 1)
+                {
+                    break;
+                }
+                else
+                {
+                    Console.WriteLine("tcp connecting!");
+                }
+            }
+
+            ustBolt.setPara();
+            ustBolt.tcpClientThreadStart();
+            /*************写入参数**************/
+            //写入基准波形
+            double[] waveDataTmp = ustBolt.utsMath.readCsvZeroWaveData(@"C:\Users\hhhhh\Desktop\design\Project\USTBolt_Client\SimWaveData8178.csv");
+            Array.Copy(waveDataTmp, ustBolt.ustbData.lstuintZeroWaveDataBuff[0], waveDataTmp.Length);
+            Array.Copy(waveDataTmp, ustBolt.ustbData.lstuintZeroWaveDataBuff[1], waveDataTmp.Length);
+            /*************下发设置**************/
+            ustBolt.setPara();
+            /*************进行轴力计算**************/
+            // ustBolt.StartStressCalThread();
+        }
+        
+        /// <summary>
+        /// 开始测量按钮
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void StartBtn_Click(object sender, RoutedEventArgs e) {
+
+
         }
     }
     

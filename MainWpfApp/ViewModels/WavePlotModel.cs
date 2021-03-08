@@ -7,18 +7,34 @@ using System.ComponentModel;
 using OxyPlot;
 using OxyPlot.Series;
 using OxyPlot.Axes;
+using System.Threading;
+using System.Windows;
 
 namespace MainWpfApp.ViewModels
 {
-    class WavePlotModel {
+    public class WavePlotModel {
 
-        public PlotModel SimplePlotModel { get; set; }
-        public PlotModel SimplePlotModel_2 { get; set; }
+        public PlotModel LWavePlotModel { get; set; }   // 纵波
+        public PlotModel TWavePlotModel { get; set; }   // 横波
+        public MainWindow mainwin;
+
         public WavePlotModel() {
-            SimplePlotModel = new PlotModel();
+            mainwin = (MainWindow)Application.Current.MainWindow;
+        }
 
-            var yAxis = new LinearAxis()
+        /// <summary>
+        /// 初始化波形图 绘制零应力参考波形
+        /// </summary>
+        public void Init() {
+            mainwin.TransversePlot.DataContext = mainwin.wavePlotModel;
+            mainwin.LongitudinalPlot.DataContext = mainwin.wavePlotModel;
+            LWavePlotModel = new PlotModel();
+            TWavePlotModel = new PlotModel();
+
+            /** 纵波 **/
+            var yAxisT = new LinearAxis()
             {
+                /* y轴 */
                 Position = AxisPosition.Left,
                 Minimum = -100,
                 Maximum = 100,
@@ -27,31 +43,97 @@ namespace MainWpfApp.ViewModels
                 MinorGridlineStyle = LineStyle.Solid,
                 MajorGridlineStyle = LineStyle.Solid,
             };
-            var xAxis = new LinearAxis()
+            var xAxisT = new LinearAxis()
             {
+                /* x轴 */
                 Position = AxisPosition.Bottom,
                 Minimum = 0,
-                Maximum = 60,
-                Title = "长度(mm)",
+                Maximum = 8178,
+                Title = "长度",
                 TitlePosition = 0.5,
                 MinorGridlineStyle = LineStyle.Solid,
                 MajorGridlineStyle = LineStyle.Solid,
             };
-            //线条
-            //var lineSerial = new LineSeries() { Title = "直线实例"};
-            //lineSerial.Points.Add(new DataPoint(0, 0));
-            //lineSerial.Points.Add(new DataPoint(10, 10));
-            SimplePlotModel.Axes.Add(yAxis);
-            SimplePlotModel.Axes.Add(xAxis);
-            //SimplePlotModel.Series.Add(lineSerial);
-            SimplePlotModel.Title = "横波波形";
+            int i = 0;
+            // 纵波零力波形绘制
+            var zeroWave = new LineSeries() { Title = "参考波形", InterpolationAlgorithm = InterpolationAlgorithms.CanonicalSpline };
+            var zeroWaveList = mainwin.ustBolt.ustbData.lstuintZeroWaveDataBuff[0];
+            Task.Factory.StartNew(() => {
+                while (true)
+                {
+                    if (zeroWaveList == null)
+                    {
+                        Thread.Sleep(500);
+                        continue;
+                    }
+                    if (i == 8178)
+                    {
+                        break;
+                    }
+                    zeroWave.Points.Add(new DataPoint(i, zeroWaveList[i]));
+                    i++;
+                    //LWavePlotModel.InvalidatePlot(true);
+                    //Thread.Sleep(500);
+                }
+            });
+            LWavePlotModel.Axes.Add(yAxisT);
+            LWavePlotModel.Axes.Add(xAxisT);
+            LWavePlotModel.Series.Add(zeroWave);
+            LWavePlotModel.Title = "纵波波形";
 
-            //函数sin(x)
-            var funcSerial = new FunctionSeries((x) => { return Math.Sin(x); }, 0, 10, 0.1, "y=sin(x)");
-            SimplePlotModel.Series.Add(funcSerial);
-            SimplePlotModel_2 = SimplePlotModel;
-            SimplePlotModel_2.Title = "纵波波形";
+
+            /** 横波波形图 **/
+            var yAxisL = new LinearAxis()
+            {
+                /* y轴 */
+                Position = AxisPosition.Left,
+                Minimum = -100,
+                Maximum = 100,
+                Title = "回波强度",
+                TitlePosition = 0.5,
+                MinorGridlineStyle = LineStyle.Solid,
+                MajorGridlineStyle = LineStyle.Solid,
+            };
+            var xAxisL = new LinearAxis()
+            {
+                /* x轴 */
+                Position = AxisPosition.Bottom,
+                Minimum = 0,
+                Maximum = 8178,
+                Title = "长度",
+                TitlePosition = 0.5,
+                MinorGridlineStyle = LineStyle.Solid,
+                MajorGridlineStyle = LineStyle.Solid,
+            };
+            TWavePlotModel.Axes.Add(yAxisL);
+            TWavePlotModel.Axes.Add(xAxisL);
+            TWavePlotModel.Title = "横波波形";
+
+            PrintStressWave();
         }
+
+        /// <summary>
+        /// 板卡波形图绘制
+        /// </summary>
+        public void PrintStressWave() {
+            var LWave = new LineSeries() { Title = "实际波形",  InterpolationAlgorithm = InterpolationAlgorithms.CanonicalSpline};
+            Task.Factory.StartNew(()=> {
+                while (true) {
+                    int i = 0;
+                    var LWaveList = mainwin.ustBolt.ustbData.lstuintWaveDataBuff[0];
+                    while (true) {
+                        if (i == 8178) {
+                            break;
+                        }
+                        LWave.Points.Add(new DataPoint(i, LWaveList[i]));
+                        i++;
+                    }
+                    Thread.Sleep(1000);
+                }
+            });
+            LWavePlotModel.Series.Add(LWave);
+        }
+
     }
    
    

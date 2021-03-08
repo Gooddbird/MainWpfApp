@@ -43,14 +43,14 @@
         </Canvas>
 
         <!--横波波形图-->
-        <oxyplot:PlotView x:Name="TransversePlot" Model="{Binding SimplePlotModel}" Margin="10, 10, 10, 10" Grid.Row="1" Grid.ColumnSpan="2">
+        <oxyplot:PlotView x:Name="TransversePlot" Model="{Binding TWavePlotModel}" Margin="10, 10, 10, 10" Grid.Row="1" Grid.ColumnSpan="2">
             <oxyplot:PlotView.DataContext>
                 <MainWpfApp.ViewModels:WavePlotModel/>
             </oxyplot:PlotView.DataContext>
         </oxyplot:PlotView>
 
         <!--纵波波形图-->
-        <oxyplot:PlotView x:Name="LongitudinalPlot" Model="{Binding SimplePlotModel_2}" Margin="10, 10, 10, 10" Grid.Row="1" Grid.Column="2" Grid.ColumnSpan="2">
+        <oxyplot:PlotView x:Name="LongitudinalPlot" Model="{Binding LWavePlotModel}" Margin="10, 10, 10, 10" Grid.Row="1" Grid.Column="2" Grid.ColumnSpan="2">
             <oxyplot:PlotView.DataContext>
                 <MainWpfApp.ViewModels:WavePlotModel/>
             </oxyplot:PlotView.DataContext>
@@ -178,7 +178,7 @@
             <TextBlock Text="操作面板" FontSize="24"/>
             <StackPanel>
                 <Button Background="#70AD47" Content="锁定波形" HorizontalAlignment="Center" VerticalAlignment="Center" Width="207" Height="37" FontSize="18" UseLayoutRounding="True" FontWeight="Medium" Foreground ="#FFF7F4F4" Padding="0" Margin="0,20,0,8"/>
-                <Button Background="#70AD47" Content="开始测量" HorizontalAlignment="Center" VerticalAlignment="Center" Width="207" Height="37" FontSize="18" UseLayoutRounding="True" FontWeight="Medium" Foreground ="#FFF7F4F4" Padding="0" Margin="0,8"/>
+                <Button x:Name="StartBtn" Background="#70AD47" Content="开始测量" HorizontalAlignment="Center" VerticalAlignment="Center" Width="207" Height="37" FontSize="18" UseLayoutRounding="True" FontWeight="Medium" Foreground ="#FFF7F4F4" Padding="0" Margin="0,8" Click="StartBtn_Click"/>
                 <Button Background="#70AD47" Content="单点记录" HorizontalAlignment="Center" VerticalAlignment="Center" Width="207" Height="37" FontSize="18" UseLayoutRounding="True" FontWeight="Medium" Foreground ="#FFF7F4F4" Padding="0" Margin="0,8"/>
                 <Button Background="#70AD47" Content="实时记录" HorizontalAlignment="Center" VerticalAlignment="Center" Width="207" Height="37" FontSize="18" UseLayoutRounding="True" FontWeight="Medium" Foreground ="#FFF7F4F4" Padding="0" Margin="0,8"/>
             </StackPanel>

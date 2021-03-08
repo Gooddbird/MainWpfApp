@@ -5,7 +5,7 @@ using System.Threading;
 using System.IO;
 
 
-class USTBolt : TcpClient
+public class USTBolt : TcpClient
 {
 
     //固定参数
