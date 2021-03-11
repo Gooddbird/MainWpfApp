@@ -1,25 +1,23 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.ComponentModel;
+﻿using System.Threading.Tasks;
 using OxyPlot;
 using OxyPlot.Series;
 using OxyPlot.Axes;
 using System.Threading;
 using System.Windows;
 
-namespace MainWpfApp.ViewModels
-{
+namespace MainWpfApp.ViewModels {
     public class WavePlotModel {
 
         public PlotModel LWavePlotModel { get; set; }   // 纵波
         public PlotModel TWavePlotModel { get; set; }   // 横波
-        public MainWindow mainwin;
+        private int MaxWaveSize;                        // 最大波采集深度
+        private LinearAxis xAxisL;                      // 纵波横坐标
+        private LinearAxis yAxisL;                      // 纵波纵坐标
+        public MainWindow mainwin;                      // 主窗口
 
         public WavePlotModel() {
             mainwin = (MainWindow)Application.Current.MainWindow;
+            MaxWaveSize = mainwin.ustBolt.MAXWAVESIZE;
         }
 
         /// <summary>
@@ -32,7 +30,7 @@ namespace MainWpfApp.ViewModels
             TWavePlotModel = new PlotModel();
 
             /** 纵波 **/
-            var yAxisT = new LinearAxis()
+            yAxisL = new LinearAxis()
             {
                 /* y轴 */
                 Position = AxisPosition.Left,
@@ -43,12 +41,12 @@ namespace MainWpfApp.ViewModels
                 MinorGridlineStyle = LineStyle.Solid,
                 MajorGridlineStyle = LineStyle.Solid,
             };
-            var xAxisT = new LinearAxis()
+            xAxisL = new LinearAxis()
             {
                 /* x轴 */
                 Position = AxisPosition.Bottom,
                 Minimum = 0,
-                Maximum = 8178,
+                Maximum = MaxWaveSize,
                 Title = "长度",
                 TitlePosition = 0.5,
                 MinorGridlineStyle = LineStyle.Solid,
@@ -66,24 +64,23 @@ namespace MainWpfApp.ViewModels
                         Thread.Sleep(500);
                         continue;
                     }
-                    if (i == 8178)
+                    if (i == MaxWaveSize)
                     {
                         break;
                     }
                     zeroWave.Points.Add(new DataPoint(i, zeroWaveList[i]));
                     i++;
-                    //LWavePlotModel.InvalidatePlot(true);
-                    //Thread.Sleep(500);
-                }
+                                    }
             });
-            LWavePlotModel.Axes.Add(yAxisT);
-            LWavePlotModel.Axes.Add(xAxisT);
+            LWavePlotModel.Axes.Add(yAxisL);
+            LWavePlotModel.Axes.Add(xAxisL);
             LWavePlotModel.Series.Add(zeroWave);
             LWavePlotModel.Title = "纵波波形";
+            
 
 
             /** 横波波形图 **/
-            var yAxisL = new LinearAxis()
+            var yAxisT = new LinearAxis()
             {
                 /* y轴 */
                 Position = AxisPosition.Left,
@@ -94,21 +91,21 @@ namespace MainWpfApp.ViewModels
                 MinorGridlineStyle = LineStyle.Solid,
                 MajorGridlineStyle = LineStyle.Solid,
             };
-            var xAxisL = new LinearAxis()
+            var xAxisT = new LinearAxis()
             {
                 /* x轴 */
                 Position = AxisPosition.Bottom,
                 Minimum = 0,
-                Maximum = 8178,
+                Maximum = MaxWaveSize, 
                 Title = "长度",
                 TitlePosition = 0.5,
                 MinorGridlineStyle = LineStyle.Solid,
                 MajorGridlineStyle = LineStyle.Solid,
             };
-            TWavePlotModel.Axes.Add(yAxisL);
-            TWavePlotModel.Axes.Add(xAxisL);
+            TWavePlotModel.Axes.Add(yAxisT);
+            TWavePlotModel.Axes.Add(xAxisT);
             TWavePlotModel.Title = "横波波形";
-
+            
             PrintStressWave();
         }
 
@@ -116,23 +113,61 @@ namespace MainWpfApp.ViewModels
         /// 板卡波形图绘制
         /// </summary>
         public void PrintStressWave() {
-            var LWave = new LineSeries() { Title = "实际波形",  InterpolationAlgorithm = InterpolationAlgorithms.CanonicalSpline};
+            var LWave = new LineSeries() { Title = "实际波形", InterpolationAlgorithm = InterpolationAlgorithms.CanonicalSpline };
+            LWavePlotModel.Series.Add(LWave);
             Task.Factory.StartNew(()=> {
                 while (true) {
-                    int i = 0;
-                    var LWaveList = mainwin.ustBolt.ustbData.lstuintWaveDataBuff[0];
-                    while (true) {
-                        if (i == 8178) {
-                            break;
+                    if (mainwin.IsLockWave == false)
+                    {
+
+                        LWave.Points.Clear();
+                        int i = 0;
+                        var LWaveList = mainwin.ustBolt.ustbData.lstuintWaveDataBuff[0];
+                        while (true)
+                        {
+                            if (i == MaxWaveSize)
+                            {
+                                break;
+                            }
+                            LWave.Points.Add(new DataPoint(i, LWaveList[i]));
+                            i++;
                         }
-                        LWave.Points.Add(new DataPoint(i, LWaveList[i]));
-                        i++;
+                        Thread.Sleep(200);
                     }
-                    Thread.Sleep(1000);
+                    else {
+                        Thread.Sleep(500);
+                    }
+                    LWavePlotModel.InvalidatePlot(true);
+                    
                 }
             });
-            LWavePlotModel.Series.Add(LWave);
         }
+
+        /// <summary>
+        /// 取纵波X轴当前起始点 取其小数部分 小于0返回0
+        /// </summary>
+        /// <returns></returns>
+        public int GetLWaveXStart() {
+            int start = (int)xAxisL.ActualMinimum;
+
+            if (start >= 0 && start < MaxWaveSize) {
+                return start;
+            }
+            return 0;
+        }
+
+        /// <summary>
+        /// 取纵波X轴当前结束 取其小数部分 小于0返回0
+        /// </summary>
+        /// <returns></returns>
+        public int GetLWaveXEnd() {
+            int end = (int)xAxisL.ActualMaximum;
+            if (end >= 0 && end < MaxWaveSize) {
+                return end;
+            }
+            return MaxWaveSize; 
+        }
+
 
     }
    

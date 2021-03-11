@@ -10,7 +10,7 @@ public class USTBolt : TcpClient
 
     //固定参数
     int ChNum = 2; //通道数
-    int MAXWAVESIZE = 8178;//最大波形深度
+    public int MAXWAVESIZE = 8178;//最大波形深度
     double sampleTime = 5; //采样间隔 ns
 
     //参数结构体

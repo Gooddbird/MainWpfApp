@@ -5,7 +5,9 @@ using System.Windows.Forms;
 
 namespace MainWpfApp.Util {
     public class InitUtil : BindEx {
+
         public static BoltModel CurrentBolt { get; internal set; }
+        public static MainWindow mainwin = (MainWindow)System.Windows.Application.Current.MainWindow;
 
         public static void SaveProjAsFun() {
 
@@ -16,8 +18,8 @@ namespace MainWpfApp.Util {
             if (sfd != null)
             {
                 //获得保存文件的路径
-                MainWindow.Proj_path = sfd.FileName; //保存
-                using (FileStream fsWrite = new FileStream(MainWindow.Proj_path, FileMode.OpenOrCreate, FileAccess.Write))
+                mainwin.Proj_path = sfd.FileName; //保存
+                using (FileStream fsWrite = new FileStream(mainwin.Proj_path, FileMode.OpenOrCreate, FileAccess.Write))
                 {
 
                 }
@@ -35,7 +37,7 @@ namespace MainWpfApp.Util {
             if (openFileDialog1.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
                 // MessageBox.Show(openFileDialog1.FileName);
-                MainWindow.Proj_path = openFileDialog1.FileName;
+                mainwin.Proj_path = openFileDialog1.FileName;
             }
         }
 

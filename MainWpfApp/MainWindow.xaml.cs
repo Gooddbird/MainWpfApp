@@ -1,15 +1,12 @@
 ﻿using MainWpfApp.ViewModels;
-using OxyPlot;
-using OxyPlot.Axes;
-using OxyPlot.Series;
 using SQLite;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Navigation;
 
@@ -18,6 +15,16 @@ namespace MainWpfApp {
     /// MainWindow.xaml 的交互逻辑
     /// </summary>
     public partial class MainWindow : Window, INotifyPropertyChanged {
+
+        public string Proj_path { get; set; }                               // 工程db路径
+        public DbConnection db;                                             // 工程db连接对象
+        public BoltModel CurrentBolt { get; set; }                          // 当前选择螺栓项目
+        public List<BoltModel> _BoltList = new List<BoltModel>();           // 螺栓列表
+        public WavePlotModel wavePlotModel { get; set; }
+        public USTBolt ustBolt = new USTBolt();
+        public bool IsLockWave = false;                                     // 是否锁定波形 默认为否
+        public event PropertyChangedEventHandler PropertyChanged;
+
         public MainWindow() {
             InitializeComponent();
             BoltComboList.ItemsSource = null;
@@ -97,7 +104,7 @@ namespace MainWpfApp {
         /// <param name="e"></param>
         private void OpenProj_Click(object sender, RoutedEventArgs e) {
             Util.InitUtil.OpenProjFun();
-            SetPara();
+            ConnectDB();
         }
 
         /// <summary>
@@ -120,7 +127,7 @@ namespace MainWpfApp {
         }
 
         /// <summary>
-        /// 添加螺栓项目(此处知识预先添加 实际要点击保存后才会插入到db)
+        /// 添加螺栓项目(此处只是预先添加 实际要点击保存后才会插入到db)
         /// </summary>
         private void AddItemFun() {
             if (Proj_path == null) {
@@ -156,20 +163,6 @@ namespace MainWpfApp {
             }
         }
 
-        public static string Proj_path { get; set; }    // 工程db路径
-
-        public static DbConnection db;                        // 工程db连接对象
-
-        public BoltModel CurrentBolt { get; set; }      // 当前选择螺栓项目
-
-        public static List<BoltModel> _BoltList = new List<BoltModel>();   // 螺栓列表
-
-        public WavePlotModel wavePlotModel { get; set; }
-
-        public USTBolt ustBolt = new USTBolt(); 
-
-        public event PropertyChangedEventHandler PropertyChanged;
- 
         
         /// <summary>
         /// copy 螺栓参数 触发修改事件
@@ -190,10 +183,10 @@ namespace MainWpfApp {
         /// <summary>
         /// 连接db 设置螺栓初始参数
         /// </summary>
-        public void SetPara() {
+        public void ConnectDB() {
             try
             {
-                db = new MainWpfApp.ViewModels.DbConnection(Proj_path);
+                db = new DbConnection(Proj_path);
                 _BoltList = db.Bolts.ToList();
                 BuildBoltComboList(0);
             }
@@ -252,6 +245,9 @@ namespace MainWpfApp {
         }
 
         
+        /// <summary>
+        /// 初始化 连接板卡 下发板卡参数 开启tcp线程从板卡获取实时波形数据 
+        /// </summary>
         private void Init() {
             /*************初始化**************/
             ustBolt.USTBDataInit();
@@ -268,18 +264,45 @@ namespace MainWpfApp {
                     Console.WriteLine("tcp connecting!");
                 }
             }
-
-            ustBolt.setPara();
+            // 开启下发板卡参数线程
+            StartPushParaThread();
+            // 开启tcp线程获取板卡回送数据
             ustBolt.tcpClientThreadStart();
             /*************写入参数**************/
             //写入基准波形
             double[] waveDataTmp = ustBolt.utsMath.readCsvZeroWaveData(@"C:\Users\hhhhh\Desktop\design\Project\USTBolt_Client\SimWaveData8178.csv");
             Array.Copy(waveDataTmp, ustBolt.ustbData.lstuintZeroWaveDataBuff[0], waveDataTmp.Length);
             Array.Copy(waveDataTmp, ustBolt.ustbData.lstuintZeroWaveDataBuff[1], waveDataTmp.Length);
-            /*************下发设置**************/
-            ustBolt.setPara();
-            /*************进行轴力计算**************/
-            // ustBolt.StartStressCalThread();
+        }
+
+
+        /// <summary>
+        /// 下发板卡参数线程 定时执行
+        /// </summary>
+        private void StartPushParaThread() {
+            Task.Factory.StartNew(() => {
+                while (true)
+                {
+                    if (ustBolt.tcpConnFlag == 0)
+                    {
+                        Thread.Sleep(5000);
+                    }
+                    else
+                    {
+                        // 注：子线程要获取主线程UI 需经过Dispacther.Invoke
+                        Application.Current.Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Background,
+                            new Action(() => {
+                                ustBolt.ustbData.pulsWidt = Convert.ToDouble(pulsWidt.Text);
+                                ustBolt.ustbData.exciVolt = Convert.ToDouble(exciVolt.Text);
+                                ustBolt.ustbData.prf = Convert.ToDouble(prf.Text);
+                                ustBolt.ustbData.damping = Convert.ToDouble(damping.Text);
+                            }));
+                        ustBolt.setPara();
+                        Thread.Sleep(3000);
+                    }
+                }
+
+            });
         }
         
         /// <summary>
@@ -288,8 +311,36 @@ namespace MainWpfApp {
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void StartBtn_Click(object sender, RoutedEventArgs e) {
+            ustBolt.ustbData.LWaveTDEStart = wavePlotModel.GetLWaveXStart();
+            ustBolt.ustbData.LWaveTEDEnd = wavePlotModel.GetLWaveXEnd(); 
+            ustBolt.StartStressCalThread();
+        }
 
+        /// <summary>
+        /// 锁定波形按钮选中事件
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void LockWaveBtn_Checked(object sender, RoutedEventArgs e) {
+            IsLockWave = true;
+        }
 
+        /// <summary>
+        /// 锁定波形按钮非选中事件
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void LockWaveBtn_Unchecked(object sender, RoutedEventArgs e) {
+            IsLockWave = false;
+        }
+
+        /// <summary>
+        /// 主窗口关闭事件 关闭所有其他的线程 包括绘波形线程 TCP线程等
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Window_Closing(object sender, CancelEventArgs e) {
+            Process.GetCurrentProcess().Kill();
         }
     }
     

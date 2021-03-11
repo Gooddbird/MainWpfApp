@@ -12,6 +12,7 @@ namespace MainWpfApp {
         public BoltModel CurrentBolt { get; set; }      // 当前操作螺栓项目
 
         public bool isSuccessd = false;
+        public MainWindow mainwin = (MainWindow)Application.Current.MainWindow;
 
         public AddItemDialog()
         {
@@ -38,7 +39,7 @@ namespace MainWpfApp {
                 // MainWindow.BoltsToSave.Add(CurrentBolt);
                 // Close();
                 try {
-                    var db = new MainWpfApp.ViewModels.DbConnection(MainWindow.Proj_path);
+                    var db = new MainWpfApp.ViewModels.DbConnection(mainwin.Proj_path);
                     int rt = db.Insert(CurrentBolt, typeof(BoltModel));
                     if (rt == 1)
                     {

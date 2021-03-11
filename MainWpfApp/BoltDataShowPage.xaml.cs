@@ -12,10 +12,11 @@ namespace MainWpfApp {
     public partial class BoltDataShowPage : Page {
         public BoltDataShowPage() {
             InitializeComponent();
-            BoltList = MainWindow.db.Bolts.ToList();
+            BoltList = mainwin.db.Bolts.ToList();
             BoltsTable.ItemsSource = BoltList; 
         }
         public List<BoltModel> BoltList = new List<BoltModel>();        // 当前螺栓列表 绑定前端datagrid控件 随时变换
+        public static MainWindow mainwin = (MainWindow)System.Windows.Application.Current.MainWindow;
 
         /// <summary>
         /// 返回按钮点击事件
@@ -32,20 +33,20 @@ namespace MainWpfApp {
         private void SaveBtn_Click(object sender, RoutedEventArgs e) {
             try {
                 // 删除
-                foreach (BoltModel t in GetDelBolts(BoltList, MainWindow.db.Bolts.ToList())) {
-                    MainWindow.db.Delete(t);
+                foreach (BoltModel t in GetDelBolts(BoltList, mainwin.db.Bolts.ToList())) {
+                    mainwin.db.Delete(t);
                 }
 
                 // 新增或修改
                 foreach (BoltModel t in BoltList) {
-                    MainWindow.db.InsertOrReplace(t);
+                    mainwin.db.InsertOrReplace(t);
                 }
-                MainWindow._BoltList = MainWindow.db.Bolts.ToList();
+                mainwin._BoltList = mainwin.db.Bolts.ToList();
                 var win = (MainWindow)Application.Current.MainWindow;
                 win.BuildBoltComboList(0);
             }
             catch (SQLiteException) {
-                MainWindow.db.Rollback();
+                mainwin.db.Rollback();
                 MessageBox.Show("更新失败，请重试！");
             }
         }
