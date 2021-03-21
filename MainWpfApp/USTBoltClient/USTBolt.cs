@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading;
 using System.IO;
-
+using OxyPlot;
 
 public class USTBolt : TcpClient
 {
@@ -84,6 +84,7 @@ public class USTBolt : TcpClient
     //USTBData结构体初始化
     public void USTBDataInit()
     {
+        MAXWAVESIZE = mainwin.MaxSize;
         //轴力计算方法
         ustbData.stressCalTech = "ZB";  // 纵波法ZB 横纵法HZB 残余应力CYYL
 
@@ -398,6 +399,27 @@ public class USTBolt : TcpClient
             {
                 ustbData.lstuintWaveDataBuff[ChInx][i] = bytesRead[i * 2 + 10] * 256 + bytesRead[i * 2 + 1 + 10] - 512;
                 //ustbData.lstuintWaveDataBuff[ChInx][i] = ustbData.lstuintWaveDataBuff[ChInx][i] / 512 * 100; //转化为100%
+            }
+            /*  绘图 */ 
+            try
+            {
+                mainwin.wavePlotModel.LWave.Points.Clear();
+                int i = 0;
+                var LWaveList = ustbData.lstuintWaveDataBuff[0];
+                while (true)
+                {
+                    if (i == waveLen)
+                    {
+                        break;
+                    }
+                    mainwin.wavePlotModel.LWave.Points.Add(new DataPoint(i, LWaveList[i]));
+                    i++;
+                }
+                mainwin.wavePlotModel.LWavePlotModel.InvalidatePlot(true);
+            }
+            catch (Exception) {
+                mainwin.wavePlotModel.LWave.Points.Clear();
+                mainwin.wavePlotModel.LWavePlotModel.InvalidatePlot(true);
             }
 
             getWaveSysTime = currentTimeMills(); //更新波形获取时间

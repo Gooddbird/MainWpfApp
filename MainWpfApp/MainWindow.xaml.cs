@@ -21,17 +21,20 @@ namespace MainWpfApp {
         public BoltModel CurrentBolt { get; set; }                          // 当前选择螺栓项目
         public List<BoltModel> _BoltList = new List<BoltModel>();           // 螺栓列表
         public WavePlotModel wavePlotModel { get; set; }
-        public USTBolt ustBolt = new USTBolt();
+        public USTBolt ustBolt; 
         public bool IsLockWave = false;                                     // 是否锁定波形 默认为否
         public event PropertyChangedEventHandler PropertyChanged;
+        public int MaxSize = 8178;                                          // 最大波形采集深度，一般不更改
+        public int WaveUpdateDelay = 200;                                   // 波形更新频率控制
 
         public MainWindow() {
+            Application.Current.MainWindow = this;
             InitializeComponent();
             BoltComboList.ItemsSource = null;
             CurrentBolt = new BoltModel();
             Bolt_Para.DataContext = CurrentBolt;
             BuildBoltComboList(-1);
-            Application.Current.MainWindow = this;
+            ustBolt = new USTBolt();
             Init();
             InitWave();
         }
@@ -273,6 +276,7 @@ namespace MainWpfApp {
             double[] waveDataTmp = ustBolt.utsMath.readCsvZeroWaveData(@"C:\Users\hhhhh\Desktop\design\Project\USTBolt_Client\SimWaveData8178.csv");
             Array.Copy(waveDataTmp, ustBolt.ustbData.lstuintZeroWaveDataBuff[0], waveDataTmp.Length);
             Array.Copy(waveDataTmp, ustBolt.ustbData.lstuintZeroWaveDataBuff[1], waveDataTmp.Length);
+
         }
 
 

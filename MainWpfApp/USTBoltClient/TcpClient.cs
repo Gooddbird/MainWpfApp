@@ -1,18 +1,20 @@
-﻿using System;
+﻿using MainWpfApp;
+using System;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
-
+using System.Windows;
 
 public class TcpClient
     {
         private Socket socketsend;
         private Thread tcpClientThread;
         NetworkStream clientStream;
+        public MainWindow mainwin = (MainWindow)Application.Current.MainWindow;
 
-        //public String ipStr = "192.168.1.160";  //服务器ip
+    //public String ipStr = "192.168.1.160";  //服务器ip
 
-        public String ipStr = "192.168.31.157";  //tcpserver ip 调式用 
+    public String ipStr = "127.0.0.1";  //tcpserver ip 调式用 
         //public String ipStr = "192.168.31.235";  //服务器ip
         public String portStr = "5000";  //端口号
 
@@ -53,9 +55,11 @@ public class TcpClient
             byte[] getDataByt = { (byte)0xff, (byte)0x03 };
             while (true)
             {
+            if (mainwin.IsLockWave == false)
+            {
+
                 try
                 {
-
                     tcpSendData(getDataByt);
                     dataBufferLen = 0;
                     dataBufferLen = socketsend.Receive(dataBuffer); //阻塞连接
@@ -71,14 +75,18 @@ public class TcpClient
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine("tcpThread erro："+e.Message);
+                    Console.WriteLine("tcpThread erro：" + e.Message);
                     Console.WriteLine("正在重新连接!");
                     tcpConnFlag = 0;
                     tcpConnect();
 
                 }
-
-                Thread.Sleep(30);
+                Thread.Sleep(300);
+            }
+            else {
+                Thread.Sleep(1000);
+            }
+                
             }
         }
 

@@ -4,6 +4,7 @@ using OxyPlot.Series;
 using OxyPlot.Axes;
 using System.Threading;
 using System.Windows;
+using System;
 
 namespace MainWpfApp.ViewModels {
     public class WavePlotModel {
@@ -14,10 +15,11 @@ namespace MainWpfApp.ViewModels {
         private LinearAxis xAxisL;                      // 纵波横坐标
         private LinearAxis yAxisL;                      // 纵波纵坐标
         public MainWindow mainwin;                      // 主窗口
+        public LineSeries LWave { get; set; }
 
         public WavePlotModel() {
             mainwin = (MainWindow)Application.Current.MainWindow;
-            MaxWaveSize = mainwin.ustBolt.MAXWAVESIZE;
+            MaxWaveSize = mainwin.MaxSize;
         }
 
         /// <summary>
@@ -51,6 +53,7 @@ namespace MainWpfApp.ViewModels {
                 TitlePosition = 0.5,
                 MinorGridlineStyle = LineStyle.Solid,
                 MajorGridlineStyle = LineStyle.Solid,
+                TickStyle = TickStyle.Inside,
             };
             int i = 0;
             // 纵波零力波形绘制
@@ -113,34 +116,9 @@ namespace MainWpfApp.ViewModels {
         /// 板卡波形图绘制
         /// </summary>
         public void PrintStressWave() {
-            var LWave = new LineSeries() { Title = "实际波形", InterpolationAlgorithm = InterpolationAlgorithms.CanonicalSpline };
+            LWave = new LineSeries() { Title = "实际波形", InterpolationAlgorithm = InterpolationAlgorithms.CanonicalSpline };
             LWavePlotModel.Series.Add(LWave);
-            Task.Factory.StartNew(()=> {
-                while (true) {
-                    if (mainwin.IsLockWave == false)
-                    {
-
-                        LWave.Points.Clear();
-                        int i = 0;
-                        var LWaveList = mainwin.ustBolt.ustbData.lstuintWaveDataBuff[0];
-                        while (true)
-                        {
-                            if (i == MaxWaveSize)
-                            {
-                                break;
-                            }
-                            LWave.Points.Add(new DataPoint(i, LWaveList[i]));
-                            i++;
-                        }
-                        Thread.Sleep(200);
-                    }
-                    else {
-                        Thread.Sleep(500);
-                    }
-                    LWavePlotModel.InvalidatePlot(true);
-                    
-                }
-            });
+            /** 绘图逻辑在 TcpClient 中获取波形数据部分**/
         }
 
         /// <summary>
