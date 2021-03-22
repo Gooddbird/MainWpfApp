@@ -21,6 +21,8 @@ namespace MainWpfApp.ViewModels {
 
         private double _Nominal_diameter; //公称直径
 
+        private string _Description;    // 备注
+
         [PrimaryKey]
         public string Bolt_id {
             get { return _Bolt_id; }
@@ -73,6 +75,16 @@ namespace MainWpfApp.ViewModels {
                 OnPropertyChanged("Nominal_diameter");
             }
         } 
+
+        public string Description
+        {
+            get { return _Description; }
+            set
+            {
+                _Description = value;
+                OnPropertyChanged("Description");
+            }
+        }
     }
 
     public class DbConnection : SQLiteConnection 

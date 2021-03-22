@@ -1,6 +1,5 @@
 ﻿using MainWpfApp.ViewModels;
 using SQLite;
-using System;
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
@@ -16,7 +15,7 @@ namespace MainWpfApp {
             BoltsTable.ItemsSource = BoltList; 
         }
         public List<BoltModel> BoltList = new List<BoltModel>();        // 当前螺栓列表 绑定前端datagrid控件 随时变换
-        public static MainWindow mainwin = (MainWindow)System.Windows.Application.Current.MainWindow;
+        public static MainWindow mainwin = (MainWindow)Application.Current.MainWindow;
 
         /// <summary>
         /// 返回按钮点击事件

@@ -40,7 +40,14 @@ namespace MainWpfApp {
                 // Close();
                 try {
                     var db = new MainWpfApp.ViewModels.DbConnection(mainwin.Proj_path);
-                    int rt = db.Insert(CurrentBolt, typeof(BoltModel));
+                    BoltModel bolt = db.Find<BoltModel>(CurrentBolt.Bolt_id);
+                    if (bolt != null)
+                    {
+                        if (MessageBox.Show("已存在该项目，是否替换？", "提示", MessageBoxButton.YesNo) == MessageBoxResult.No) {
+                            return; 
+                        }
+                    }
+                    int rt = db.InsertOrReplace(CurrentBolt, typeof(BoltModel));
                     if (rt == 1)
                     {
                         isSuccessd = true;

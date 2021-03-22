@@ -26,6 +26,7 @@ namespace MainWpfApp {
         public event PropertyChangedEventHandler PropertyChanged;
         public int MaxSize = 8178;                                          // 最大波形采集深度，一般不更改
         public int WaveUpdateDelay = 200;                                   // 波形更新频率控制
+        public string Proj_name;                                            // 工程名字
 
         public MainWindow() {
             Application.Current.MainWindow = this;
@@ -37,6 +38,7 @@ namespace MainWpfApp {
             ustBolt = new USTBolt();
             Init();
             InitWave();
+            Proj_Name.DataContext = Proj_name;
         }
 
 
@@ -180,6 +182,7 @@ namespace MainWpfApp {
             m1.Bolt_length = m2.Bolt_length;
             m1.Clamp_length = m2.Clamp_length;
             m1.Nominal_diameter = m2.Nominal_diameter;
+            m1.Description = m2.Description;
         }
         
 

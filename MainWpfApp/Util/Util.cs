@@ -27,29 +27,31 @@ namespace MainWpfApp.Util {
         }
 
         public static void OpenProjFun() {
-            System.Windows.Forms.OpenFileDialog openFileDialog1 = new System.Windows.Forms.OpenFileDialog
+            OpenFileDialog openFileDialog1 = new OpenFileDialog
             {
                 InitialDirectory = "c:\\",
                 Filter = "db files (*.db)|*.db",
                 FilterIndex = 1,
                 RestoreDirectory = true
             };
-            if (openFileDialog1.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            if (openFileDialog1.ShowDialog() == DialogResult.OK)
             {
                 // MessageBox.Show(openFileDialog1.FileName);
                 mainwin.Proj_path = openFileDialog1.FileName;
+                mainwin.Proj_name = Path.GetFileNameWithoutExtension(mainwin.Proj_path);
+                mainwin.Proj_Name.Text = mainwin.Proj_name;
             }
         }
 
         private static bool OpenFileWindow() {
-            System.Windows.Forms.OpenFileDialog openFileDialog1 = new System.Windows.Forms.OpenFileDialog
+            OpenFileDialog openFileDialog1 = new OpenFileDialog
             {
                 InitialDirectory = "c:\\",
                 Filter = "db files (*.db)|*.db|All files (*.*)|*.*",
                 FilterIndex = 1,
                 RestoreDirectory = true
             };
-            return openFileDialog1.ShowDialog() == System.Windows.Forms.DialogResult.OK;
+            return openFileDialog1.ShowDialog() == DialogResult.OK;
         }
 
         private static SaveFileDialog OpenSaveFileWin() {
@@ -61,7 +63,7 @@ namespace MainWpfApp.Util {
                 //保存对话框是否记忆上次打开的目录 
                 RestoreDirectory = true,
             };
-            if (sfd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            if (sfd.ShowDialog() == DialogResult.OK)
             {
                 return sfd;
             }
