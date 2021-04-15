@@ -22,7 +22,7 @@ public class USTBolt : TcpClient
         /****************页面显示数据*******************/
         public double axialForce;  //轴力 MPa
         public double timeDelay; //时延 ns
-        public double maxXcorr; //最大互相关系数
+        public double maxXcorr; //波形相似度
         public double maxTWXcorr; //横波最大互相关系数
         public double echoTime; //纵波回波时间
         public double echoTransTime; //横波回波时间

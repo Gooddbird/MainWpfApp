@@ -8,11 +8,10 @@
         xmlns:MainWpfApp.ViewModels="clr-namespace:MainWpfApp.ViewModels"
         xmlns:Util="clr-namespace:MainWpfApp.Util" x:Class="MainWpfApp.MainWindow"
         KeyDown="Window_KeyDown"
-        mc:Ignorable="d" Height="780" Width="1490" Title="超声波螺栓预紧力测定 (Designed by ikerli)" Topmost="True" Closing="Window_Closing">
+        mc:Ignorable="d" Height="820" Width="1490" Title="超声波螺栓预紧力测定 (Designed by ikerli)" Topmost="True" Closing="Window_Closing" Background="White">
 
     
-    <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
-        <Grid x:Name="MainGrid" Height="752" Width="1484">
+    <Grid x:Name="MainGrid">
 
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="4.5*"/>
@@ -22,16 +21,17 @@
                 <ColumnDefinition Width="6*"/>
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
-                <RowDefinition Height="1*"/>
+                <RowDefinition Height="0.5*"/>
                 <RowDefinition Height="8*"/>
-                <RowDefinition Height="6*"/>
+                <RowDefinition Height="6.5*"/>
                 <RowDefinition Height="2*"/>
             </Grid.RowDefinitions>
 
+
             <!--菜单栏-->
-            <Canvas Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3">
-                <Menu Height="44">
-                    <MenuItem Header="开始" FontSize="16" Height="44">
+            <DockPanel Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="5" VerticalAlignment="Center">
+                <Menu DockPanel.Dock="Top">
+                    <MenuItem Header="开始" FontSize="16">
                         <MenuItem x:Name="AddItem" Header="新建项目        Ctrl+N" Click="AddItem_Click"/>
                         <MenuItem x:Name="AddProj" Header="新建工程        Ctrl+P" Click="AddProj_Click"/>
                         <MenuItem x:Name="SaveProj" Header="保存工程        Ctrl+S" Click="SaveProj_Click"/>
@@ -41,18 +41,17 @@
                     <MenuItem x:Name="OpenData" Header="数据库" FontSize="16" Click="OpenData_Click"/>
                     <MenuItem Header="帮助" FontSize="16"/>
                 </Menu>
-
-            </Canvas>
+            </DockPanel>
 
             <!--横波波形图-->
-            <oxyplot:PlotView x:Name="TransversePlot" Model="{Binding TWavePlotModel}" Margin="10, 10, 10, 10" Grid.Row="1" Grid.ColumnSpan="2">
+            <!--<oxyplot:PlotView x:Name="TransversePlot" Model="{Binding TWavePlotModel}" Margin="10, 10, 10, 10" Grid.Row="1" Grid.ColumnSpan="2">
                 <oxyplot:PlotView.DataContext>
                     <MainWpfApp.ViewModels:WavePlotModel/>
                 </oxyplot:PlotView.DataContext>
-            </oxyplot:PlotView>
+            </oxyplot:PlotView>-->
 
             <!--纵波波形图-->
-            <oxyplot:PlotView x:Name="LongitudinalPlot" Model="{Binding LWavePlotModel}" Margin="10, 10, 10, 10" Grid.Row="1" Grid.Column="2" Grid.ColumnSpan="2">
+            <oxyplot:PlotView x:Name="LongitudinalPlot" Model="{Binding LWavePlotModel}" Margin="10, 10, 10, 10" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="4">
                 <oxyplot:PlotView.DataContext>
                     <MainWpfApp.ViewModels:WavePlotModel/>
                 </oxyplot:PlotView.DataContext>
@@ -84,12 +83,12 @@
 
             </StackPanel>
 
-            <GridSplitter x:Name="竖直可调节分割框" Grid.Column="4" Grid.Row="0" Background="#666666" HorizontalAlignment="Left" Grid.RowSpan="4" Width="3"/>
+            <GridSplitter x:Name="竖直可调节分割框" Grid.Column="4" Grid.Row="1" Background="#666666" HorizontalAlignment="Left" Grid.RowSpan="4" Width="3"/>
 
-            <Border Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="5" VerticalAlignment="Top" Background="#666666" Height="3"/>
+            <Border Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="5" VerticalAlignment="Top" Background="#666666" Height="3"/>
             <Border Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="5" VerticalAlignment="Bottom" Background="#666666" Height="3"/>
-            <Border Grid.Row="0" Grid.RowSpan="4" HorizontalAlignment="Left" Width="3" Background="#666666" />
-            <Border Grid.Row="0" Grid.RowSpan="4" Grid.Column="4" HorizontalAlignment="Right" Width="3" Background="#666666" />
+            <Border Grid.Row="1" Grid.RowSpan="4" HorizontalAlignment="Left" Width="3" Background="#666666" />
+            <Border Grid.Row="1" Grid.RowSpan="4" Grid.Column="4" HorizontalAlignment="Right" Width="3" Background="#666666" />
             <Border Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="4" VerticalAlignment="Top" Background="#666666" Height="2"/>
 
             <!--波形图框-->
@@ -113,7 +112,7 @@
 
             
             <!--右侧栏-->
-            <StackPanel Grid.Row="0" Grid.Column="4" Grid.RowSpan="4" Margin="20,10">
+            <StackPanel Grid.Row="1" Grid.Column="4" Grid.RowSpan="4" Margin="20,10">
                 <Canvas Height="30">
                     <TextBlock Text="测试工程名" x:Name="project_name" FontWeight="Bold" FontSize="20" Width="100" Height="26"/>
                     <TextBlock Name="Proj_Name" Text="Test" Canvas.Left="130" FontSize="20" Background="#0000ff" Foreground="#FFFFFBFB"/>
@@ -188,6 +187,6 @@
             </StackPanel>
 
         </Grid>
-    </ScrollViewer>
+
 </Window>
 

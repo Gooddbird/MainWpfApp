@@ -26,10 +26,10 @@ namespace MainWpfApp.ViewModels {
         /// 初始化波形图 绘制零应力参考波形
         /// </summary>
         public void Init() {
-            mainwin.TransversePlot.DataContext = mainwin.wavePlotModel;
+            // mainwin.TransversePlot.DataContext = mainwin.wavePlotModel;
             mainwin.LongitudinalPlot.DataContext = mainwin.wavePlotModel;
             LWavePlotModel = new PlotModel();
-            TWavePlotModel = new PlotModel();
+            // TWavePlotModel = new PlotModel();
 
             /** 纵波 **/
             yAxisL = new LinearAxis()
@@ -83,31 +83,31 @@ namespace MainWpfApp.ViewModels {
 
 
             /** 横波波形图 **/
-            var yAxisT = new LinearAxis()
-            {
-                /* y轴 */
-                Position = AxisPosition.Left,
-                Minimum = -100,
-                Maximum = 100,
-                Title = "回波强度",
-                TitlePosition = 0.5,
-                MinorGridlineStyle = LineStyle.Solid,
-                MajorGridlineStyle = LineStyle.Solid,
-            };
-            var xAxisT = new LinearAxis()
-            {
-                /* x轴 */
-                Position = AxisPosition.Bottom,
-                Minimum = 0,
-                Maximum = MaxWaveSize, 
-                Title = "长度",
-                TitlePosition = 0.5,
-                MinorGridlineStyle = LineStyle.Solid,
-                MajorGridlineStyle = LineStyle.Solid,
-            };
-            TWavePlotModel.Axes.Add(yAxisT);
-            TWavePlotModel.Axes.Add(xAxisT);
-            TWavePlotModel.Title = "横波波形";
+            //var yAxisT = new LinearAxis()
+            //{
+            //    /* y轴 */
+            //    Position = AxisPosition.Left,
+            //    Minimum = -100,
+            //    Maximum = 100,
+            //    Title = "回波强度",
+            //    TitlePosition = 0.5,
+            //    MinorGridlineStyle = LineStyle.Solid,
+            //    MajorGridlineStyle = LineStyle.Solid,
+            //};
+            //var xAxisT = new LinearAxis()
+            //{
+            //    /* x轴 */
+            //    Position = AxisPosition.Bottom,
+            //    Minimum = 0,
+            //    Maximum = MaxWaveSize, 
+            //    Title = "长度",
+            //    TitlePosition = 0.5,
+            //    MinorGridlineStyle = LineStyle.Solid,
+            //    MajorGridlineStyle = LineStyle.Solid,
+            //};
+            //TWavePlotModel.Axes.Add(yAxisT);
+            //TWavePlotModel.Axes.Add(xAxisT);
+            //TWavePlotModel.Title = "横波波形";
             
             PrintStressWave();
         }
@@ -117,6 +117,7 @@ namespace MainWpfApp.ViewModels {
         /// </summary>
         public void PrintStressWave() {
             LWave = new LineSeries() { Title = "实际波形", InterpolationAlgorithm = InterpolationAlgorithms.CanonicalSpline };
+           
             LWavePlotModel.Series.Add(LWave);
             /** 绘图逻辑在 TcpClient 中获取波形数据部分**/
         }
