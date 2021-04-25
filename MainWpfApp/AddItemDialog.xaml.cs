@@ -1,4 +1,5 @@
-﻿using MainWpfApp.ViewModels;
+﻿using MainWpfApp.Util;
+using MainWpfApp.ViewModels;
 using SQLite;
 using System;
 using System.Windows;
@@ -38,8 +39,8 @@ namespace MainWpfApp {
             else {
                 // MainWindow.BoltsToSave.Add(CurrentBolt);
                 // Close();
+                var db = new DbConnection(mainwin.Proj_path);
                 try {
-                    var db = new MainWpfApp.ViewModels.DbConnection(mainwin.Proj_path);
                     BoltModel bolt = db.Find<BoltModel>(CurrentBolt.Bolt_id);
                     if (bolt != null)
                     {
@@ -51,6 +52,14 @@ namespace MainWpfApp {
                     if (rt == 1)
                     {
                         isSuccessd = true;
+                        //string tableName = "t_zero_" + bolt.Bolt_id;
+                        //string sql = "CREATE TABLE IF NOT EXISTS " + tableName +
+                        //    "(id INT PRIMARY KEY NOT NULL, " +
+                        //    "bolt_id VARCHAR NOT NULL, " +
+                        //    "position INT NOT NULL, " +
+                        //    "data FLOAT NOT NULL);";
+                        //db.Execute(sql);
+                        //db.Commit();
                     }
                     else
                     {
@@ -62,6 +71,7 @@ namespace MainWpfApp {
                 {
                     isSuccessd = false;
                     MessageBox.Show("添加失败，请重试！");
+                    db.Rollback();
                 }
                 Close();
             }

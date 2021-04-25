@@ -140,6 +140,7 @@
     <Compile Include="USTBoltClient\UTSMath.cs" />
     <Compile Include="Util\DbConn.cs" />
     <Compile Include="Util\Util.cs" />
+    <Compile Include="ViewModels\BoltLogModel.cs" />
     <Compile Include="ViewModels\BoltModel.cs" />
     <Compile Include="ViewModels\WavePlotModel.cs" />
     <Compile Include="ViewModels\StressPlotModel.cs" />

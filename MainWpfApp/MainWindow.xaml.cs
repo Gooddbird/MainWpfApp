@@ -1,4 +1,6 @@
-﻿using MainWpfApp.ViewModels;
+﻿using MainWpfApp.Util;
+using MainWpfApp.ViewModels;
+using OxyPlot.Axes;
 using SQLite;
 using System;
 using System.Collections.Generic;
@@ -19,10 +21,13 @@ namespace MainWpfApp {
         public string Proj_path { get; set; }                               // 工程db路径
         public DbConnection db;                                             // 工程db连接对象
         public BoltModel CurrentBolt { get; set; }                          // 当前选择螺栓项目
+        public BoltLogModel CurrentBoltLog { get; set; }                    // 当前测量记录对
         public List<BoltModel> _BoltList = new List<BoltModel>();           // 螺栓列表
         public WavePlotModel wavePlotModel { get; set; }
+        public StressPlotModel stressPlotModel { get; set; }
         public USTBolt ustBolt; 
         public bool IsLockWave = false;                                     // 是否锁定波形 默认为否
+        public bool IsTesting = false;                                     // 是否正在测量
         public event PropertyChangedEventHandler PropertyChanged;
         public int MaxSize = 8178;                                          // 最大波形采集深度，一般不更改
         public int WaveUpdateDelay = 200;                                   // 波形更新频率控制
@@ -38,6 +43,7 @@ namespace MainWpfApp {
             ustBolt = new USTBolt();
             Init();
             InitWave();
+            InitStressPlot();
             Proj_Name.DataContext = Proj_name;
         }
 
@@ -240,14 +246,34 @@ namespace MainWpfApp {
                 tmp = _BoltList[index]; 
             }
             CopyBoltPara(CurrentBolt, tmp);
+            
         }
-        
+
+        private void UpdateStressPlot() {
+            if (CurrentBolt == null) {
+                MessageBox.Show("请先选择螺栓");
+            }
+            try
+            {
+                string tableName = "t_log_" + CurrentBolt.Bolt_id;
+                string sql = "SELECT * FROM " + tableName;
+            }
+            catch (SQLiteException) {
+
+            }
+        }
+
         /// <summary>
-        /// 初始化波形 绘制零应力波形
+        /// 初始化波形
         /// </summary>
         private void InitWave() {
             wavePlotModel = new WavePlotModel();
             wavePlotModel.Init();
+        }
+
+        private void InitStressPlot() {
+            stressPlotModel = new StressPlotModel();
+            stressPlotModel.Init();
         }
 
         
@@ -270,23 +296,25 @@ namespace MainWpfApp {
                     Console.WriteLine("tcp connecting!");
                 }
             }
-            // 开启下发板卡参数线程
-            StartPushParaThread();
+            // 开启UI线程
+            StartUIThread();
             // 开启tcp线程获取板卡回送数据
             ustBolt.tcpClientThreadStart();
             /*************写入参数**************/
             //写入基准波形
-            double[] waveDataTmp = ustBolt.utsMath.readCsvZeroWaveData(@"C:\Users\hhhhh\Desktop\design\Project\USTBolt_Client\SimWaveData8178.csv");
-            Array.Copy(waveDataTmp, ustBolt.ustbData.lstuintZeroWaveDataBuff[0], waveDataTmp.Length);
-            Array.Copy(waveDataTmp, ustBolt.ustbData.lstuintZeroWaveDataBuff[1], waveDataTmp.Length);
+            //double[] waveDataTmp = ustBolt.utsMath.readCsvZeroWaveData(@"C:\Users\hhhhh\Desktop\design\Project\USTBolt_Client\SimWaveData8178.csv");
+            //Array.Copy(waveDataTmp, ustBolt.ustbData.lstuintZeroWaveDataBuff[0], waveDataTmp.Length);
+            //Array.Copy(waveDataTmp, ustBolt.ustbData.lstuintZeroWaveDataBuff[1], waveDataTmp.Length);
 
         }
 
 
         /// <summary>
-        /// 下发板卡参数线程 定时执行
+        /// 参数线程 定时执行
+        /// 1. 获取测量结果 更新UI
+        /// 2. 下发板卡参数
         /// </summary>
-        private void StartPushParaThread() {
+        private void StartUIThread() {
             Task.Factory.StartNew(() => {
                 while (true)
                 {
@@ -299,30 +327,27 @@ namespace MainWpfApp {
                         // 注：子线程要获取主线程UI 需经过Dispacther.Invoke
                         Application.Current.Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Background,
                             new Action(() => {
+                                AxialForce.Text = ustBolt.ustbData.axialForce.ToString();
+                                TimeDelay.Text = ustBolt.ustbData.timeDelay.ToString();
+                                MaxXcorr.Text = ustBolt.ustbData.maxXcorr.ToString();
                                 ustBolt.ustbData.pulsWidt = Convert.ToDouble(pulsWidt.Text);
                                 ustBolt.ustbData.exciVolt = Convert.ToDouble(exciVolt.Text);
                                 ustBolt.ustbData.prf = Convert.ToDouble(prf.Text);
                                 ustBolt.ustbData.damping = Convert.ToDouble(damping.Text);
+                                ustBolt.ustbData.Ks= Convert.ToDouble(Ks.Text);
+                                ustBolt.ustbData.KT= Convert.ToDouble(KT.Text);
+                                ustBolt.ustbData.T0= Convert.ToDouble(ZeroTem.Text);
+                                ustBolt.ustbData.T1= Convert.ToDouble(TestTem.Text);
                             }));
                         ustBolt.setPara();
-                        Thread.Sleep(3000);
+                        Thread.Sleep(1000);
                     }
                 }
 
             });
         }
         
-        /// <summary>
-        /// 开始测量按钮
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void StartBtn_Click(object sender, RoutedEventArgs e) {
-            ustBolt.ustbData.LWaveTDEStart = wavePlotModel.GetLWaveXStart();
-            ustBolt.ustbData.LWaveTEDEnd = wavePlotModel.GetLWaveXEnd(); 
-            ustBolt.StartStressCalThread();
-        }
-
+        
         /// <summary>
         /// 锁定波形按钮选中事件
         /// </summary>
@@ -348,6 +373,68 @@ namespace MainWpfApp {
         /// <param name="e"></param>
         private void Window_Closing(object sender, CancelEventArgs e) {
             Process.GetCurrentProcess().Kill();
+        }
+
+
+        /// <summary>
+        /// 开始测量按钮按下
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void StartBtn_Checked(object sender, RoutedEventArgs e) {
+            IsLockWave = false;
+            IsTesting = true;
+            ustBolt.ustbData.LWaveTDEStart = wavePlotModel.GetLWaveXStart();
+            ustBolt.ustbData.LWaveTEDEnd = wavePlotModel.GetLWaveXEnd();
+            ustBolt.StartStressCalThread();
+        }
+
+        private void StartBtn_Unchecked(object sender, RoutedEventArgs e) {
+            IsTesting = false;
+        }
+
+        private void SingleLogBtn_Click(object sender, RoutedEventArgs e) {
+            if (CurrentBolt == null || CurrentBolt.Bolt_id == null) {
+                MessageBox.Show("请先选择螺栓！");
+                return;
+            }
+            if (!IsTesting) {
+                MessageBox.Show("未在测量过程中！");
+                return;
+            }
+            try
+            {
+                DateTime nowTime = DateTime.Now;
+                double force = Convert.ToDouble(AxialForce.Text);
+                double timeDelay = Convert.ToDouble(TimeDelay.Text);
+                double maxXcorr = Convert.ToDouble(MaxXcorr.Text);
+                // 插入记录到db
+                CurrentBoltLog = new BoltLogModel
+                {
+                    Bolt_id = CurrentBolt.Bolt_id,
+                    AxialForce = (float)force,
+                    TimeDelay = (float)timeDelay,
+                    MaxXcorr = (float)maxXcorr,
+                    TestTime = nowTime.ToString()
+                };
+                db.Insert(CurrentBoltLog, typeof(BoltLogModel));
+
+                // 绘制当前点
+                // stressPlotModel.stressWave.Points.Add(new OxyPlot.Series.ScatterPoint(DateTimeAxis.ToDouble(nowTime), force));
+                stressPlotModel.points.Add(new StressLogPoint(DateTimeAxis.ToDouble(nowTime), force, timeDelay, maxXcorr));
+                // stressPlotModel.stressWave.ItemsSource = stressPlotModel.points;
+                stressPlotModel.stressPlot.InvalidatePlot(true);
+            }
+            catch (SQLiteException)
+            {
+                Console.WriteLine("insert exception!, sql: ");
+                MessageBox.Show("发生异常，请重试！");
+                db.Rollback();
+            }
+            catch (Exception) {
+                MessageBox.Show("发生异常，请重启！");
+            }
+
         }
     }
     

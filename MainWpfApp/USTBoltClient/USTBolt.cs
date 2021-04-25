@@ -4,6 +4,7 @@ using System.Text;
 using System.Threading;
 using System.IO;
 using OxyPlot;
+using System.Windows;
 
 public class USTBolt : TcpClient
 {
@@ -12,6 +13,7 @@ public class USTBolt : TcpClient
     int ChNum = 2; //通道数
     public int MAXWAVESIZE = 8178;//最大波形深度
     double sampleTime = 5; //采样间隔 ns
+    bool isZeroBuf = true;  // 当前采集数据是否为零应力波形数据
 
     //参数结构体
     public struct USTBData
@@ -65,6 +67,8 @@ public class USTBolt : TcpClient
         public double samplingFreq;  //采样率 Hz 1/sampleTime*1e9
         public double lowCutOff; //低截至频率 Hz 固定
         public double highCutOff; //高截至频率 Hz 固定
+
+        // public bool isZeroBuf;
 
     };
     public USTBData ustbData;
@@ -148,6 +152,7 @@ public class USTBolt : TcpClient
         ustbData.lowCutOff = 0.5e6; //滤波 低截至频率 Hz
         ustbData.highCutOff = 10e6; //滤波 高截至频率 Hz
 
+       // ustbData.isZeroBuf = true;
     }
 
     /**
@@ -274,6 +279,9 @@ public class USTBolt : TcpClient
     {
         while (true)
         {
+            if (mainwin.IsTesting == false) {
+                return;
+            }
             if (tcpConnFlag != 0) //tcp未断开
             {
                 //跳点处理
@@ -293,11 +301,11 @@ public class USTBolt : TcpClient
                 }
 
                 // 滤波
-                for (int chinx = 0; chinx < ChNum; chinx++)
-                {
-                    ustbData.lstuintWaveDataBuff[chinx] = utsMath.ZeroPhaseFIR(ustbData.lstuintWaveDataBuff[chinx],
-                        ustbData.samplingFreq, ustbData.lowCutOff, ustbData.highCutOff);
-                }
+                //for (int chinx = 0; chinx < ChNum; chinx++)
+                //{
+                //    ustbData.lstuintWaveDataBuff[chinx] = utsMath.ZeroPhaseFIR(ustbData.lstuintWaveDataBuff[chinx],
+                //        ustbData.samplingFreq, ustbData.lowCutOff, ustbData.highCutOff);
+                //}
 
                 // 将处理波形写入文件 调试用
                 //writWaveDataToCSV(ustbData.lstuintWaveDataBuff[ustbData.currChInx - 1],
@@ -313,10 +321,13 @@ public class USTBolt : TcpClient
                     Array.Copy(ustbData.lstuintWaveDataBuff[LWavaChIndx], ustbData.LWaveTDEStart, testWaveData, 0, LwaveTDELen);
                     Array.Copy(ustbData.lstuintZeroWaveDataBuff[LWavaChIndx], ustbData.LWaveTDEStart, zeroWaveData, 0, LwaveTDELen);
 
+                    //var stressTuple = utsMath.GetBoltAxialForce_ZB_JX(zeroWaveData, testWaveData,
+                    //    sampleTime, ustbData.interTimes, ustbData.zeroWaveEchoTime,
+                    //    ustbData.Ks, ustbData.KT, ustbData.T1, ustbData.T0, "GCCFZP");
+
                     var stressTuple = utsMath.GetBoltAxialForce_ZB_JX(zeroWaveData, testWaveData,
                         sampleTime, ustbData.interTimes, ustbData.zeroWaveEchoTime,
-                        ustbData.Ks, ustbData.KT, ustbData.T1, ustbData.T0, "GCCFZP");
-
+                        ustbData.Ks, ustbData.KT, ustbData.T1, ustbData.T0, "GCC");
                     ustbData.axialForce = stressTuple.Item1;
                     ustbData.timeDelay = stressTuple.Item2;
                     ustbData.maxXcorr = utsMath.MaxValue(stressTuple.Item3);
@@ -344,7 +355,9 @@ public class USTBolt : TcpClient
 
                 if ((currentTimeMills() - getWaveSysTime) > 3000) //波形数据停止更新3秒
                 {
-                    Console.WriteLine("波形数据停止更新");
+                    // Console.WriteLine("波形数据停止更新");
+                    MessageBox.Show("波形数据停止更新！");
+                    return;
                 }
 
                 Thread.Sleep(30);  //降低计算频率
@@ -352,7 +365,9 @@ public class USTBolt : TcpClient
             else
             {
                 Console.WriteLine("StressCalThread: TCP断开连接");
-                Thread.Sleep(1000);
+                MessageBox.Show("服务端已断开连接！");
+                // Thread.Sleep(1000);
+                return;
             }
         }
     }
@@ -399,6 +414,25 @@ public class USTBolt : TcpClient
             {
                 ustbData.lstuintWaveDataBuff[ChInx][i] = bytesRead[i * 2 + 10] * 256 + bytesRead[i * 2 + 1 + 10] - 512;
                 //ustbData.lstuintWaveDataBuff[ChInx][i] = ustbData.lstuintWaveDataBuff[ChInx][i] / 512 * 100; //转化为100%
+            }
+            if (isZeroBuf == true) {
+                // 零应力波形绘制
+                for(int j = 0; j < ChNum; j++)
+                {
+                    for (int t = 0; t < waveLen; t++) {
+                        ustbData.lstuintZeroWaveDataBuff[j][t] = ustbData.lstuintWaveDataBuff[j][t];
+                    }
+                }
+                var zeroWaveList = ustbData.lstuintZeroWaveDataBuff[0];
+                int i = 0;
+               // mainwin.wavePlotModel.zeroWave.Points.Clear();
+                while (i < waveLen)
+                {
+                    mainwin.wavePlotModel.zeroWave.Points.Add(new DataPoint(i, zeroWaveList[i]));
+                    i++;
+                }
+                mainwin.wavePlotModel.LWavePlotModel.InvalidatePlot(true);
+                isZeroBuf = false;
             }
             /*  绘图 */ 
             try

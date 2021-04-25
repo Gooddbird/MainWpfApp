@@ -86,14 +86,5 @@ namespace MainWpfApp.ViewModels {
             }
         }
     }
-
-    public class DbConnection : SQLiteConnection 
-    {
-        public TableQuery<BoltModel> Bolts { get { return this.Table<BoltModel>(); }}
-
-        public DbConnection(string path) : base(path) 
-        {
-            CreateTable<BoltModel>();
-        }
-    }
+   
 }

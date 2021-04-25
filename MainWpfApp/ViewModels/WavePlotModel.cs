@@ -16,6 +16,7 @@ namespace MainWpfApp.ViewModels {
         private LinearAxis yAxisL;                      // 纵波纵坐标
         public MainWindow mainwin;                      // 主窗口
         public LineSeries LWave { get; set; }
+        public LineSeries zeroWave { get; set; }
 
         public WavePlotModel() {
             mainwin = (MainWindow)Application.Current.MainWindow;
@@ -55,29 +56,9 @@ namespace MainWpfApp.ViewModels {
                 MajorGridlineStyle = LineStyle.Solid,
                 TickStyle = TickStyle.Inside,
             };
-            int i = 0;
-            // 纵波零力波形绘制
-            var zeroWave = new LineSeries() { Title = "参考波形", InterpolationAlgorithm = InterpolationAlgorithms.CanonicalSpline };
-            var zeroWaveList = mainwin.ustBolt.ustbData.lstuintZeroWaveDataBuff[0];
-            Task.Factory.StartNew(() => {
-                while (true)
-                {
-                    if (zeroWaveList == null)
-                    {
-                        Thread.Sleep(500);
-                        continue;
-                    }
-                    if (i == MaxWaveSize)
-                    {
-                        break;
-                    }
-                    zeroWave.Points.Add(new DataPoint(i, zeroWaveList[i]));
-                    i++;
-                                    }
-            });
+            
             LWavePlotModel.Axes.Add(yAxisL);
             LWavePlotModel.Axes.Add(xAxisL);
-            LWavePlotModel.Series.Add(zeroWave);
             LWavePlotModel.Title = "纵波波形";
             
 
@@ -110,6 +91,34 @@ namespace MainWpfApp.ViewModels {
             //TWavePlotModel.Title = "横波波形";
             
             PrintStressWave();
+            PrintZeroStressWave();
+        }
+
+        /// <summary>
+        /// 绘制零应力波形
+        /// </summary>
+        public void PrintZeroStressWave() {
+            // 纵波零力波形绘制
+            zeroWave = new LineSeries() { Title = "参考波形", InterpolationAlgorithm = InterpolationAlgorithms.CanonicalSpline };
+            //int i = 0;
+            //var zeroWaveList = mainwin.ustBolt.ustbData.lstuintZeroWaveDataBuff[0];
+            //Task.Factory.StartNew(() => {
+            //    while (true)
+            //    {
+            //        if (zeroWaveList == null)
+            //        {
+            //            Thread.Sleep(500);
+            //            continue;
+            //        }
+            //        if (i == MaxWaveSize)
+            //        {
+            //            break;
+            //        }
+            //        zeroWave.Points.Add(new DataPoint(i, zeroWaveList[i]));
+            //        i++;
+            //    }
+            //});
+            LWavePlotModel.Series.Add(zeroWave);
         }
 
         /// <summary>
