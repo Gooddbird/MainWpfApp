@@ -35,17 +35,22 @@ namespace MainWpfApp {
             if (String.IsNullOrEmpty(BoltId.Text))
             {
                 MessageBox.Show("请输入项目编号！");
+            } if (String.IsNullOrEmpty(StressCoefficient.Text)) {
+                MessageBox.Show("请输入应力系数！");
             }
-            else {
+            else
+            {
                 // MainWindow.BoltsToSave.Add(CurrentBolt);
                 // Close();
                 var db = new DbConnection(mainwin.Proj_path);
-                try {
+                try
+                {
                     BoltModel bolt = db.Find<BoltModel>(CurrentBolt.Bolt_id);
                     if (bolt != null)
                     {
-                        if (MessageBox.Show("已存在该项目，是否替换？", "提示", MessageBoxButton.YesNo) == MessageBoxResult.No) {
-                            return; 
+                        if (MessageBox.Show("已存在该项目，是否替换？", "提示", MessageBoxButton.YesNo) == MessageBoxResult.No)
+                        {
+                            return;
                         }
                     }
                     int rt = db.InsertOrReplace(CurrentBolt, typeof(BoltModel));

@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Globalization;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -32,6 +33,7 @@ namespace MainWpfApp {
         public int MaxSize = 8178;                                          // 最大波形采集深度，一般不更改
         public int WaveUpdateDelay = 200;                                   // 波形更新频率控制
         public string Proj_name;                                            // 工程名字
+        public int index = 1;                                               // 当前测量结果横坐标
 
         public MainWindow() {
             Application.Current.MainWindow = this;
@@ -246,20 +248,46 @@ namespace MainWpfApp {
                 tmp = _BoltList[index]; 
             }
             CopyBoltPara(CurrentBolt, tmp);
-            
+            DateTime start = DateTime.Now.AddDays(-7); 
+            DateTime end = DateTime.Now;
+            UpdateStressPlot(start, end, 30);
         }
 
-        private void UpdateStressPlot() {
+        private void UpdateStressPlot(DateTime startTime, DateTime endTime, int count) {
             if (CurrentBolt == null) {
                 MessageBox.Show("请先选择螺栓");
             }
             try
             {
-                string tableName = "t_log_" + CurrentBolt.Bolt_id;
-                string sql = "SELECT * FROM " + tableName;
+                string start = startTime.ToString();
+                string end = endTime.ToString();
+                stressPlotModel.points.Clear();
+                string sql = string.Format(
+                    "SELECT * FROM t_bolt_logs " +
+                    "WHERE Bolt_id='{0}' " +
+                    "and TestTime > '{1}' " +
+                    "and TestTime <= '{2}' " +
+                    "ORDER BY TestTime DESC " + 
+                    "LIMIT {3};",
+                    CurrentBolt.Bolt_id, start, end, count);
+                List<BoltLogModel> boltLogs = db.Query<BoltLogModel>(sql);
+                boltLogs.Reverse();
+                float maxY = -10000000;
+                float minY = 10000000;
+                foreach (BoltLogModel boltLog in boltLogs) {
+                    maxY = Math.Max(maxY, boltLog.AxialForce);
+                    minY = Math.Min(minY, boltLog.AxialForce);
+                    stressPlotModel.points.Add(new StressLogPoint(index, boltLog.AxialForce, boltLog.TestTime, boltLog.TimeDelay, boltLog.MaxXcorr, boltLog.Id));
+                    index++;
+                    stressPlotModel.stressPlot.InvalidatePlot(true);
+                }
+                stressPlotModel.xAxis.Maximum = index + 10;
+                stressPlotModel.xAxis.Reset();
+                stressPlotModel.yAxis.Reset();
             }
             catch (SQLiteException) {
-
+                db.Rollback();
+                MessageBox.Show("获取测量记录失败，请重试！");
             }
         }
 
@@ -420,8 +448,8 @@ namespace MainWpfApp {
                 db.Insert(CurrentBoltLog, typeof(BoltLogModel));
 
                 // 绘制当前点
-                // stressPlotModel.stressWave.Points.Add(new OxyPlot.Series.ScatterPoint(DateTimeAxis.ToDouble(nowTime), force));
-                stressPlotModel.points.Add(new StressLogPoint(DateTimeAxis.ToDouble(nowTime), force, timeDelay, maxXcorr));
+                stressPlotModel.points.Add(new StressLogPoint(index, force, nowTime.ToString(), timeDelay, maxXcorr, CurrentBoltLog.Id));
+                index++;
                 // stressPlotModel.stressWave.ItemsSource = stressPlotModel.points;
                 stressPlotModel.stressPlot.InvalidatePlot(true);
             }

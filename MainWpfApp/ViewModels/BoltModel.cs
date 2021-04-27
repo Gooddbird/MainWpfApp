@@ -44,7 +44,8 @@ namespace MainWpfApp.ViewModels {
                 OnPropertyChanged("Standards");
             }
         }      
-
+        
+        [NotNull]
         public double Stress_coefficient {
             get { return _Stress_coefficient; }
             set { _Stress_coefficient = value;

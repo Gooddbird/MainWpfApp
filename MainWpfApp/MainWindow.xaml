@@ -12,12 +12,12 @@
 
     
     <Grid x:Name="MainGrid">
-
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="4.5*"/>
-                <ColumnDefinition Width="4.5*"/>
-                <ColumnDefinition Width="4.5*"/>
-                <ColumnDefinition Width="4.5*"/>
+        
+        <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="5*"/>
+                <ColumnDefinition Width="5*"/>
+                <ColumnDefinition Width="5*"/>
+                <ColumnDefinition Width="3*"/>
                 <ColumnDefinition Width="6*"/>
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
@@ -31,16 +31,44 @@
             <!--菜单栏-->
             <DockPanel Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="5" VerticalAlignment="Center">
                 <Menu DockPanel.Dock="Top">
-                    <MenuItem Header="文件(F)" FontSize="16">
-                        <MenuItem x:Name="AddItem" Header="新建项目        Ctrl+N" Click="AddItem_Click"/>
-                        <MenuItem x:Name="AddProj" Header="新建工程        Ctrl+P" Click="AddProj_Click"/>
-                        <MenuItem x:Name="SaveProj" Header="保存工程        Ctrl+S" Click="SaveProj_Click"/>
-                        <MenuItem x:Name="SaveProjAs" Header="保存工程为             &gt;" Click="SaveProjAs_Click"/>
-                        <MenuItem x:Name="OpenProj" Header="打开工程          " Click="OpenProj_Click"/>
+                <MenuItem Header="文件(F)" FontSize="16">
+                    <MenuItem.Icon>
+                        <Image Source="Resources/file.png"/>
+                    </MenuItem.Icon>
+
+                    <MenuItem x:Name="AddItem" Header="新建项目        Ctrl+N" Click="AddItem_Click">
+                        <MenuItem.Icon>
+                            <Image Source="Resources/add.png"/>
+                        </MenuItem.Icon>
                     </MenuItem>
-                    <MenuItem x:Name="OpenData" Header="数据库(D)" FontSize="16" Click="OpenData_Click"/>
-                    <MenuItem Header="帮助(H)" FontSize="16"/>
-                </Menu>
+                    <MenuItem x:Name="AddProj" Header="新建工程        Ctrl+P" Click="AddProj_Click">
+                        <MenuItem.Icon>
+                            <Image Source="Resources/add-circle.png"/>
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <MenuItem x:Name="SaveProj" Header="保存工程        Ctrl+S" Click="SaveProj_Click">
+                        <MenuItem.Icon>
+                            <Image Source="Resources/save.png"/>
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <MenuItem x:Name="SaveProjAs" Header="保存工程为             &gt;" Click="SaveProjAs_Click"/>
+                    <MenuItem x:Name="OpenProj" Header="打开工程          " Click="OpenProj_Click">
+                        <MenuItem.Icon>
+                            <Image Source="Resources/file-open.png"/>
+                        </MenuItem.Icon>
+                    </MenuItem>
+                </MenuItem>
+                <MenuItem x:Name="OpenData" Header="数据库(D)" FontSize="16" Click="OpenData_Click">
+                    <MenuItem.Icon>
+                        <Image Source="Resources/data-view.png"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="帮助(H)" FontSize="16">
+                    <MenuItem.Icon>
+                        <Image Source="Resources/help.png"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+            </Menu>
             </DockPanel>
 
             <!--横波波形图-->
@@ -57,21 +85,39 @@
                 </oxyplot:PlotView.DataContext>
             </oxyplot:PlotView>
 
-            <oxyplot:PlotView x:Name="StressPlot" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="4" Margin="10, 10, 10, 10" Model="{Binding stressPlot}">
+        
+            <!--轴力图-->
+            <oxyplot:PlotView x:Name="StressPlot" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" Margin="10, 10, 10, 10" Model="{Binding stressPlot}">
                 <oxyplot:PlotView.DataContext>
                     <MainWpfApp.ViewModels:StressPlotModel/>
                 </oxyplot:PlotView.DataContext>
             </oxyplot:PlotView>
 
+
+            <Canvas Grid.Row=" 2" Grid.Column="3">
+            </Canvas>
+            <StackPanel Grid.Row="2" Grid.Column="3" HorizontalAlignment="Center" VerticalAlignment="Center">
+                <StackPanel Orientation="Horizontal">
+                    <Image Source="Resources\calendar.png"/>
+                    <TextBlock Text="  2020-01-01  " FontSize="18" HorizontalAlignment="Center" VerticalAlignment="Center"></TextBlock>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <Image Source="Resources\calendar.png"/>
+                    <TextBlock Text="  2021-02-01  " FontSize="18" HorizontalAlignment="Center" VerticalAlignment="Center"></TextBlock>
+                </StackPanel>
+            </StackPanel>
+            
+
+        
             <!--测量结果显示状态栏-->
             <StackPanel Orientation="Horizontal" Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="4">
                 <StackPanel Orientation="Horizontal" Margin="20,0,0,0">
-                    <TextBlock Text="轴力&#xA; MPa" FontSize="24" Padding="0" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    <TextBlock Text="轴力&#xA;MPa" TextAlignment="Center" FontSize="24" Padding="0" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     <TextBlock x:Name="AxialForce" Text="0" TextAlignment="Center" Canvas.Left="60" Padding="0" UseLayoutRounding="True" Margin="20,0,0,0" Background="#FFFC4949" FontSize="36" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="#FFF4E9E9" Width="200"/>
                 </StackPanel>
                 <Border Background="#FF8152EA" Margin="20,10,0,10" Width="3" />
                 <StackPanel Orientation="Horizontal" Margin="40,0,0,0">
-                    <TextBlock Text="时延&#xA; ns" FontSize="24" Padding="0" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    <TextBlock Text="时延&#xA;ns" TextAlignment="Center" FontSize="24" Padding="0" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     <TextBlock x:Name="TimeDelay" Text="+0.000" TextAlignment="Center" Canvas.Left="60" Padding="0" UseLayoutRounding="True" Margin="20,0,0,0" Background="#FF5E54FD" FontSize="36" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="#FFF4E9E9" Width="200"/>
                 </StackPanel>
                 <Border Background="#FF8152EA" Margin="20,10,0,10" Width="3" />
@@ -101,9 +147,9 @@
 
             <!--轴力时间图框-->
             <Border Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="4" Background="#FFF72B2B" Margin="5" HorizontalAlignment="Left" BorderBrush="#666666" Width="2"/>
-            <Border Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="4" Background="#FFF72B2B" Margin="5" HorizontalAlignment="Right" BorderBrush="#666666" Width="2"/>
-            <Border Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="4" Background="#FFF72B2B" Margin="5" BorderBrush="#666666" VerticalAlignment="Top" Height="2"/>
-            <Border Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="4" Background="#FFF72B2B" Margin="5" BorderBrush="#666666" VerticalAlignment="Bottom" Height="2"/>
+            <Border Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" Background="#FFF72B2B" Margin="5" HorizontalAlignment="Right" BorderBrush="#666666" Width="2"/>
+            <Border Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" Background="#FFF72B2B" Margin="5" BorderBrush="#666666" VerticalAlignment="Top" Height="2"/>
+            <Border Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" Background="#FFF72B2B" Margin="5" BorderBrush="#666666" VerticalAlignment="Bottom" Height="2"/>
 
             <!--测量结果框-->
             <Border Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="4" Background="#FF75ED4F" Margin="5" HorizontalAlignment="Left" BorderBrush="#666666" Width="2"/>

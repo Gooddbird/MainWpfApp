@@ -55,6 +55,8 @@ namespace MainWpfApp.ViewModels {
                 MinorGridlineStyle = LineStyle.Solid,
                 MajorGridlineStyle = LineStyle.Solid,
                 TickStyle = TickStyle.Inside,
+                AbsoluteMaximum = 8200,
+                AbsoluteMinimum = 0,
             };
             
             LWavePlotModel.Axes.Add(yAxisL);
