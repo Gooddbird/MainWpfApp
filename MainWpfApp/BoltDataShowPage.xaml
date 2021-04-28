@@ -6,10 +6,11 @@
       xmlns:local="clr-namespace:MainWpfApp"
       mc:Ignorable="d" 
       d:DesignHeight="450" d:DesignWidth="800"
-      Title="螺栓数据库" Background="White" Foreground="Black" WindowTitle="">
+      Title="螺栓数据库" ShowsNavigationUI="False"  Background="White" Foreground="Black" WindowTitle="">
 
     <Grid>
         <Grid.RowDefinitions>
+            <RowDefinition Height="0.5*"></RowDefinition>
             <RowDefinition Height="*"></RowDefinition>
             <RowDefinition Height="9*"></RowDefinition>
         </Grid.RowDefinitions>
@@ -20,7 +21,55 @@
             <ColumnDefinition Width="0.5*"></ColumnDefinition>
         </Grid.ColumnDefinitions>
 
-        <DataGrid Name="BoltsTable" Grid.Row="1" Grid.Column="1" AutoGenerateColumns="False" FontSize="18">
+        <!--菜单-->
+        <DockPanel Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="5" VerticalAlignment="Center">
+            <Menu DockPanel.Dock="Top">
+                <MenuItem Header="数据库操作(D)" FontSize="16">
+                    <MenuItem.Icon>
+                        <Image Source="Resources/database.png"/>
+                    </MenuItem.Icon>
+                    <MenuItem Header="选择表">
+                        <MenuItem.Icon>
+                            <Image Source="Resources/pick.png"/>
+                        </MenuItem.Icon>
+                        <MenuItem Header="螺栓数据表">
+                            <MenuItem.Icon>
+                                <Image Source="Resources/table.png"/>
+                            </MenuItem.Icon>
+                        </MenuItem>
+                        <MenuItem Header="测量记录表">
+                            <MenuItem.Icon>
+                                <Image Source="Resources/table.png"/>
+                            </MenuItem.Icon>
+                        </MenuItem>
+                    </MenuItem>
+                    <MenuItem x:Name="SaveBtn" Header="提交到数据库" Click="SaveBtn_Click">
+                        <MenuItem.Icon>
+                            <Image Source="Resources/commit.png"/>
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <MenuItem Header="刷新数据">
+                        <MenuItem.Icon>
+                            <Image Source="Resources/refresh.png"/>
+                        </MenuItem.Icon>
+                    </MenuItem>
+                </MenuItem>
+                
+                <MenuItem x:Name="BackBtn" Header="返回(B)" FontSize="16" Click="BackBtn_Click">
+                    <MenuItem.Icon>
+                        <Image Source="Resources/back.png"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="帮助(H)" FontSize="16">
+                    <MenuItem.Icon>
+                        <Image Source="Resources/help.png"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+            </Menu>
+        </DockPanel>
+
+        
+        <DataGrid Visibility="Hidden" Name="BoltsTable" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" AutoGenerateColumns="False" FontSize="18" Margin="20,5,20,10">
             <DataGrid.ColumnHeaderStyle>
                 <!--样式类型：DataGridColumnHeader（数据网格列标题）-->
                 <Style TargetType="{x:Type DataGridColumnHeader}">
@@ -28,7 +77,7 @@
                     <Setter Property="VerticalContentAlignment" Value="Center"></Setter>
                     <Setter Property="BorderThickness" Value="1"></Setter>
                     <Setter Property="Height" Value="60"></Setter>
-                    <Setter Property="Background" Value="#0099FF"/>
+                    <Setter Property="Background" Value="#FF62635A"/>
                     <Setter Property="Foreground" Value="White"></Setter>
                     <!--设置边框笔刷（BorderBrush）-->
                     <Setter Property="BorderBrush">
@@ -47,7 +96,7 @@
                     <Setter Property="Height" Value="60"></Setter>
                     <Style.Triggers>
                         <Trigger Property="IsSelected" Value="True">
-                            <Setter Property="Background" Value="SeaGreen"/>
+                            <Setter Property="Background" Value="#FFBAD18B"/>
                         </Trigger>
                     </Style.Triggers>
                 </Style>
@@ -76,10 +125,60 @@
 
             </DataGrid.Columns>
         </DataGrid>
-        <StackPanel Grid.Column="0" Grid.Row="1">
-            <Button x:Name="BackBtn" Background="#70AD47" Margin="0,0,0,5" Width="80" Content="返回" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="18" Foreground ="#FFF7F4F4" Click="BackBtn_Click"/>
-            <Button x:Name="SaveBtn" Background="#70AD47" Width="80" Content="保存" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="18" Foreground ="#FFF7F4F4" Margin="0, 5, 0, 5" Click="SaveBtn_Click"/>
+
+
+        <DataGrid Name="BoltLogsTable" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" AutoGenerateColumns="False" FontSize="18" Margin="20,5,20,10">
+            <DataGrid.ColumnHeaderStyle>
+                <!--样式类型：DataGridColumnHeader（数据网格列标题）-->
+                <Style TargetType="{x:Type DataGridColumnHeader}">
+                    <Setter Property="HorizontalContentAlignment" Value="Center"></Setter>
+                    <Setter Property="VerticalContentAlignment" Value="Center"></Setter>
+                    <Setter Property="BorderThickness" Value="1"></Setter>
+                    <Setter Property="Height" Value="60"></Setter>
+                    <Setter Property="Background" Value="#FF62635A"/>
+                    <Setter Property="Foreground" Value="White"></Setter>
+                    <!--设置边框笔刷（BorderBrush）-->
+                    <Setter Property="BorderBrush">
+                        <!--值-->
+                        <Setter.Value>
+                            <!--色刷，Opacity：透明度-->
+                            <SolidColorBrush Color="#333" Opacity="0.1"></SolidColorBrush>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+            </DataGrid.ColumnHeaderStyle>
+            <DataGrid.CellStyle>
+                <Style TargetType="DataGridCell">
+                    <Setter Property="HorizontalContentAlignment" Value="Center"></Setter>
+                    <Setter Property="VerticalContentAlignment" Value="Bottom"></Setter>
+                    <Setter Property="Height" Value="60"></Setter>
+                    <Style.Triggers>
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter Property="Background" Value="#FFBAD18B"/>
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+            </DataGrid.CellStyle>
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="项目编号" Width="1.5*" Binding="{Binding Bolt_id}" FontSize="18">
+                </DataGridTextColumn>
+
+                <DataGridTextColumn Header="轴力" Width="*" Binding="{Binding AxialForce}" FontSize="18">
+                </DataGridTextColumn>
+
+                <DataGridTextColumn Header="时延" Width="*" Binding="{Binding TimeDelay}" FontSize="18">
+                </DataGridTextColumn>
+
+                <DataGridTextColumn Header="波形相似度" Width="1.5*" Binding="{Binding MaxXcorr}" FontSize="18">
+                </DataGridTextColumn>
+
+            </DataGrid.Columns>
+        </DataGrid>
+
+        <StackPanel Orientation="Horizontal" Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="2" Margin="20,5,0,0">
+            <Image Source="Resources/table.png" Width="36" Height="36" HorizontalAlignment="Center" VerticalAlignment="Center">
+            </Image>
+            <TextBlock x:Name="TableNameText" Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="1" Text="螺栓数据库" FontSize="30" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10,0,0,0"></TextBlock>
         </StackPanel>
-        <TextBlock Grid.Column="1" Text="螺栓数据库" FontSize="36" HorizontalAlignment="Center" VerticalAlignment="Center"></TextBlock>
     </Grid>
 </Page>

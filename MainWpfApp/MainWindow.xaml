@@ -23,7 +23,7 @@
             <Grid.RowDefinitions>
                 <RowDefinition Height="0.5*"/>
                 <RowDefinition Height="8*"/>
-                <RowDefinition Height="6.5*"/>
+                <RowDefinition Height="7*"/>
                 <RowDefinition Height="2*"/>
             </Grid.RowDefinitions>
 
@@ -87,23 +87,41 @@
 
         
             <!--轴力图-->
-            <oxyplot:PlotView x:Name="StressPlot" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" Margin="10, 10, 10, 10" Model="{Binding stressPlot}">
+            <oxyplot:PlotView x:Name="StressPlot" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" Margin="10,5,0,5" Model="{Binding stressPlot}">
                 <oxyplot:PlotView.DataContext>
                     <MainWpfApp.ViewModels:StressPlotModel/>
                 </oxyplot:PlotView.DataContext>
             </oxyplot:PlotView>
 
-
-            <Canvas Grid.Row=" 2" Grid.Column="3">
+            <Canvas Grid.Row="2" Grid.Column="3" VerticalAlignment="Top" Width="150" Height="140">
             </Canvas>
-            <StackPanel Grid.Row="2" Grid.Column="3" HorizontalAlignment="Center" VerticalAlignment="Center">
-                <StackPanel Orientation="Horizontal">
-                    <Image Source="Resources\calendar.png"/>
-                    <TextBlock Text="  2020-01-01  " FontSize="18" HorizontalAlignment="Center" VerticalAlignment="Center"></TextBlock>
+
+            <StackPanel Grid.Row="2" Grid.Column="3" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,20,0,0">
+                <StackPanel>
+                    <TextBlock Text="轴力图设置" FontSize="20" FontWeight="Bold"></TextBlock>
                 </StackPanel>
-                <StackPanel Orientation="Horizontal">
+                <StackPanel Margin="0,20,0,0">
+                    <TextBlock  Text="开始日期" FontSize="18" Padding="0,10,0,0"></TextBlock>
+                </StackPanel>
+                <StackPanel x:Name="StartTimeBtn" Orientation="Horizontal" MouseDown="StartTimeBtn_MouseDown">
                     <Image Source="Resources\calendar.png"/>
-                    <TextBlock Text="  2021-02-01  " FontSize="18" HorizontalAlignment="Center" VerticalAlignment="Center"></TextBlock>
+                    <TextBlock  x:Name="StartTimeText" Text="2020-01-01" FontSize="18" HorizontalAlignment="Center" VerticalAlignment="Center" Background="#FFEAEAEA" Margin="10,0,0,0"></TextBlock>
+                </StackPanel>
+                <Canvas Panel.ZIndex="10">
+                    <Calendar x:Name="StartDateCal" SelectionMode="SingleDate" IsTodayHighlighted="False"  Visibility="Hidden"/>
+                </Canvas>
+                <StackPanel Margin="0,20,0,0">
+                    <TextBlock Text="结束日期" FontSize="18"></TextBlock>
+                </StackPanel>
+                <StackPanel x:Name="EndTimeBtn" Orientation="Horizontal" MouseDown="EndTimeBtn_MouseDown">
+                    <Image Source="Resources\calendar.png"/>
+                    <TextBlock x:Name="EndTimeText" Text="2021-02-01" FontSize="18" HorizontalAlignment="Center" VerticalAlignment="Center" Background="#FFEAEAEA" Margin="10,0,0,0"></TextBlock>
+                </StackPanel>
+                <Canvas Panel.ZIndex="10">
+                    <Calendar x:Name="EndDateCal" SelectionMode="SingleDate" IsTodayHighlighted="False"  Visibility="Hidden"/>
+                </Canvas>
+                <StackPanel Orientation="Horizontal" Margin="0,10,0,0" HorizontalAlignment="Right">
+                    <Image x:Name="SearchLogsBtn" Source="Resources/search.png" Margin="0" MouseDown="SearchLogsBtn_MouseDown"></Image>
                 </StackPanel>
             </StackPanel>
             
@@ -113,18 +131,18 @@
             <StackPanel Orientation="Horizontal" Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="4">
                 <StackPanel Orientation="Horizontal" Margin="20,0,0,0">
                     <TextBlock Text="轴力&#xA;MPa" TextAlignment="Center" FontSize="24" Padding="0" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                    <TextBlock x:Name="AxialForce" Text="0" TextAlignment="Center" Canvas.Left="60" Padding="0" UseLayoutRounding="True" Margin="20,0,0,0" Background="#FFFC4949" FontSize="36" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="#FFF4E9E9" Width="200"/>
+                    <TextBlock x:Name="AxialForce" Text="0" TextAlignment="Center" Canvas.Left="60" Padding="0" UseLayoutRounding="True" Margin="20,0,0,0" FontSize="36" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Red" Width="200" Background="#FFEAEAEA"/>
                 </StackPanel>
                 <Border Background="#FF8152EA" Margin="20,10,0,10" Width="3" />
                 <StackPanel Orientation="Horizontal" Margin="40,0,0,0">
                     <TextBlock Text="时延&#xA;ns" TextAlignment="Center" FontSize="24" Padding="0" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                    <TextBlock x:Name="TimeDelay" Text="+0.000" TextAlignment="Center" Canvas.Left="60" Padding="0" UseLayoutRounding="True" Margin="20,0,0,0" Background="#FF5E54FD" FontSize="36" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="#FFF4E9E9" Width="200"/>
+                    <TextBlock x:Name="TimeDelay" Text="+0.000" TextAlignment="Center" Canvas.Left="60" Padding="0" UseLayoutRounding="True" Margin="20,0,0,0" Background="#FFEAEAEA" FontSize="36" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="#FF4976D0" Width="200"/>
                 </StackPanel>
                 <Border Background="#FF8152EA" Margin="20,10,0,10" Width="3" />
                 <StackPanel Orientation="Horizontal" Margin="40,0,0,0">
 
                     <TextBlock Text="相似度" FontSize="24" Padding="0" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                    <TextBlock x:Name="MaxXcorr" Text="0.00" TextAlignment="Center" Canvas.Left="40" Padding="0" UseLayoutRounding="True" Margin="10,0,0,0" FontSize="36" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black" Width="150"/>
+                    <TextBlock x:Name="MaxXcorr" Text="0.00000" TextAlignment="Center" Canvas.Left="40" Padding="0" UseLayoutRounding="True" Margin="10,0,0,0" FontSize="36" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black" Width="150" Background="#FFEAEAEA"/>
                 </StackPanel>
                 <Border Background="#FF8152EA" Margin="20,10,0,10" Width="3" />
 
@@ -139,17 +157,17 @@
             <Border Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="4" VerticalAlignment="Top" Background="#666666" Height="2"/>
 
             <!--波形图框-->
-            <Border Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="4" Background="#FFF72B2B" Margin="5,8,5,5" HorizontalAlignment="Left" BorderBrush="#FFB19F9F" Width="2"/>
-            <Border Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="4" Background="#FFF72B2B" Margin="5,8,5,5" HorizontalAlignment="Right" BorderBrush="#666666" Width="2"/>
-            <Border Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="4" Background="#FFF72B2B" Margin="5,8,5,5" BorderBrush="#666666" VerticalAlignment="Top" Height="2"/>
-            <Border Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="4" Background="#FFF72B2B" Margin="5" BorderBrush="#666666" VerticalAlignment="Bottom" Height="2"/>
+            <Border Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="4" Background="#FF090808" Margin="5,8,5,5" HorizontalAlignment="Left" BorderBrush="#FFB19F9F" Width="2"/>
+            <Border Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="4" Background="#FF090808" Margin="5,8,5,5" HorizontalAlignment="Right" BorderBrush="#666666" Width="2"/>
+            <Border Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="4" Background="#FF090808" Margin="5,8,5,5" BorderBrush="#666666" VerticalAlignment="Top" Height="2"/>
+            <Border Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="4" Background="#FF090808" Margin="5" BorderBrush="#666666" VerticalAlignment="Bottom" Height="2"/>
 
 
             <!--轴力时间图框-->
-            <Border Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="4" Background="#FFF72B2B" Margin="5" HorizontalAlignment="Left" BorderBrush="#666666" Width="2"/>
-            <Border Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" Background="#FFF72B2B" Margin="5" HorizontalAlignment="Right" BorderBrush="#666666" Width="2"/>
-            <Border Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" Background="#FFF72B2B" Margin="5" BorderBrush="#666666" VerticalAlignment="Top" Height="2"/>
-            <Border Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" Background="#FFF72B2B" Margin="5" BorderBrush="#666666" VerticalAlignment="Bottom" Height="2"/>
+            <Border Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="4" Background="#FF090808" Margin="5,2,5,5" HorizontalAlignment="Left" BorderBrush="#666666" Width="2"/>
+            <Border Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="4" Background="#FF090808" Margin="5,2,5,5" HorizontalAlignment="Right" BorderBrush="#666666" Width="2"/>
+            <Border Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="4" Background="#FF090808" Margin="5,2" BorderBrush="#666666" VerticalAlignment="Top" Height="2"/>
+            <Border Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="4" Background="#FF090808" Margin="5" BorderBrush="#666666" VerticalAlignment="Bottom" Height="2"/>
 
             <!--测量结果框-->
             <Border Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="4" Background="#FF75ED4F" Margin="5" HorizontalAlignment="Left" BorderBrush="#666666" Width="2"/>
@@ -160,16 +178,24 @@
             
             <!--右侧栏-->
             <StackPanel Grid.Row="1" Grid.Column="4" Grid.RowSpan="4" Margin="20,10">
-                <Canvas Height="30">
-                    <TextBlock Text="测试工程名" x:Name="project_name" FontWeight="Bold" FontSize="20" Width="100" Height="26"/>
-                    <TextBlock Name="Proj_Name" Text="Test" Canvas.Left="130" FontSize="20" Background="#0000ff" Foreground="#FFFFFBFB"/>
-                </Canvas>
-                <TextBlock Text="项目编号" FontWeight="Bold" FontSize="20" Padding="0,8"/>
+                <StackPanel Orientation="Horizontal" Height="30">
+                    <Image Source="Resources\folder-filling.png"/>
+                    <TextBlock Text=" 当前工程" FontWeight="Bold" FontSize="20" Padding="0,12" VerticalAlignment="Center"/>
+                    <TextBlock Name="Proj_Name" Text="Test11" Margin="20, 0, 0, 0" FontSize="20" Foreground="Black" VerticalAlignment="Center" Background="#FFEAEAEA"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <Image Source="Resources\arrow-down-bold.png"/>
+                    <TextBlock Text=" 项目编号" FontWeight="Bold" FontSize="20" Padding="0,10,0,10"/>
+                </StackPanel>
                 <!--项目下拉选择框-->
                 <ComboBox x:Name="BoltComboList" Margin="0" FontSize="16" SelectedIndex="0" Padding="8" ItemsSource="{Binding BoltIdList, Mode=TwoWay}" SelectionChanged="BoltComboList_SelectionChanged">
                 </ComboBox>
-                <TextBlock Text="参数设置" FontWeight="Bold" FontSize="20" Padding="0,8"/>
-                <TabControl Height="340" BorderBrush="#FF949090" Background="#FFF6F0F0">
+
+                <StackPanel Orientation="Horizontal">
+                    <Image Source="Resources\setting-filling.png"/>
+                    <TextBlock Text=" 参数设置" FontWeight="Bold" FontSize="20" Padding="0,10,0,10"/>
+                </StackPanel>
+                <TabControl Height="340" BorderBrush="#FF949090" Background="#FFEAEAEA">
                     <!--螺栓参数设置-->
                     <TabItem Header="螺栓参数" IsSelected="True" FontSize="20">
                     <TabItem.Background>
@@ -182,31 +208,31 @@
 
                             <Canvas Width="280" Height="40">
                                 <TextBlock Text="螺栓长度(mm)  " FontWeight="Bold" FontSize="20" Padding="0,6" HorizontalAlignment="Left" Canvas.Left="0" Width="150" Height="40"/>
-                                <TextBox x:Name="BoltLength" Width="130" Text="{Binding Path=Bolt_length, Mode=TwoWay}"  HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Background="{x:Null}" BorderBrush="#FF0C0B0B" BorderThickness="2" FontWeight="Bold" Padding="0,6" Margin="0" HorizontalAlignment="Right" Canvas.Left="150" Height="36"/>
+                                <TextBox x:Name="BoltLength" Width="130" Text="{Binding Path=Bolt_length, Mode=TwoWay}"  HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Background="{x:Null}" BorderBrush="#FF0C0B0B" BorderThickness="2" FontWeight="Bold" Padding="0,6" Margin="0" HorizontalAlignment="Right" Canvas.Left="150" Height="36" FontSize="18"/>
                             </Canvas>
                             <Canvas Width="280" Margin="0" Height="40">
                                 <TextBlock Text="夹持长度(mm)  " FontWeight="Bold" FontSize="20" Padding="0,6" HorizontalAlignment="Left" Canvas.Left="0" Width="150" Height="40"/>
-                                <TextBox Text="{Binding Path=Clamp_length, Mode=TwoWay}" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Background="{x:Null}" BorderBrush="#FF0C0B0B" BorderThickness="2" FontWeight="Bold" Width="130" Padding="0,6" Margin="0" HorizontalAlignment="Right" Canvas.Left="150" Height="36"/>
+                                <TextBox Text="{Binding Path=Clamp_length, Mode=TwoWay}" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Background="{x:Null}" BorderBrush="#FF0C0B0B" BorderThickness="2" FontWeight="Bold" Width="130" Padding="0,6" Margin="0" HorizontalAlignment="Right" Canvas.Left="150" Height="36" FontSize="18"/>
                             </Canvas>
                             <Canvas Width="280" Height="40">
                                 <TextBlock Text="螺栓公称直径(mm)  " FontWeight="Bold" FontSize="20" Padding="0,6" HorizontalAlignment="Left" Canvas.Left="0" Width="180" Height="40"/>
-                                <TextBox Text="{Binding Path=Nominal_diameter, Mode=TwoWay}" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Background="{x:Null}" BorderBrush="#FF0C0B0B" BorderThickness="2" FontWeight="Bold" Width="100" Padding="0,6" Margin="0" HorizontalAlignment="Right" Canvas.Left="180" Height="36"/>
+                                <TextBox Text="{Binding Path=Nominal_diameter, Mode=TwoWay}" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Background="{x:Null}" BorderBrush="#FF0C0B0B" BorderThickness="2" FontWeight="Bold" Width="100" Padding="0,6" Margin="0" HorizontalAlignment="Right" Canvas.Left="180" Height="36" FontSize="18"/>
                             </Canvas>
                             <Canvas Width="280" Margin="0" Height="40">
                                 <TextBlock Text="应力系数(MPa)  " FontWeight="Bold" FontSize="20" Padding="0,6" HorizontalAlignment="Left" Canvas.Left="0" Width="150" Height="40"/>
-                                <TextBox x:Name="Ks" Text="{Binding Path=Stress_coefficient, Mode=TwoWay}" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Background="{x:Null}" BorderBrush="#FF0C0B0B" BorderThickness="2" FontWeight="Bold" Width="130" Padding="0,6" Margin="0" HorizontalAlignment="Right" Canvas.Left="150" Height="36"/>
+                                <TextBox x:Name="Ks" Text="{Binding Path=Stress_coefficient, Mode=TwoWay}" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Background="{x:Null}" BorderBrush="#FF0C0B0B" BorderThickness="2" FontWeight="Bold" Width="130" Padding="0,6" Margin="0" HorizontalAlignment="Right" Canvas.Left="150" Height="36" FontSize="18"/>
                             </Canvas>
                             <Canvas Width="280" Margin="0" Height="40">
                                 <TextBlock Text="温度系数  " FontWeight="Bold" FontSize="20" Padding="0,6" HorizontalAlignment="Left" Canvas.Left="0" Width="150" Height="40"/>
-                                <TextBox x:Name="KT" Text="0" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Background="{x:Null}" BorderBrush="#FF0C0B0B" BorderThickness="2" FontWeight="Bold" Width="130" Padding="0,6" Margin="0" HorizontalAlignment="Right" Canvas.Left="150" Height="36"/>
+                                <TextBox x:Name="KT" Text="0" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Background="{x:Null}" BorderBrush="#FF0C0B0B" BorderThickness="2" FontWeight="Bold" Width="130" Padding="0,6" Margin="0" HorizontalAlignment="Right" Canvas.Left="150" Height="36" FontSize="18"/>
                             </Canvas>
                             <Canvas Width="280" Margin="0" Height="40">
                                 <TextBlock Text="零应力温度(℃)  " FontWeight="Bold" FontSize="20" Padding="0,6" HorizontalAlignment="Left" Canvas.Left="0" Width="150" Height="40"/>
-                                <TextBox x:Name="ZeroTem" Text="0" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Background="{x:Null}" BorderBrush="#FF0C0B0B" BorderThickness="2" FontWeight="Bold" Width="130" Padding="0,6" Margin="0" HorizontalAlignment="Right" Canvas.Left="150" Height="36"/>
+                                <TextBox x:Name="ZeroTem" Text="0" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Background="{x:Null}" BorderBrush="#FF0C0B0B" BorderThickness="2" FontWeight="Bold" Width="130" Padding="0,6" Margin="0" HorizontalAlignment="Right" Canvas.Left="150" Height="36" FontSize="18"/>
                             </Canvas>
                             <Canvas Width="280" Margin="0" Height="40">
                                 <TextBlock Text="测试温度(℃)  " FontWeight="Bold" FontSize="20" Padding="0,6" HorizontalAlignment="Left" Canvas.Left="0" Width="150" Height="40"/>
-                                <TextBox x:Name="TestTem" Text="0" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Background="{x:Null}" BorderBrush="#FF0C0B0B" BorderThickness="2" FontWeight="Bold" Width="130" Padding="0,6" Margin="0" HorizontalAlignment="Right" Canvas.Left="150" Height="36"/>
+                                <TextBox x:Name="TestTem" Text="0" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Background="{x:Null}" BorderBrush="#FF0C0B0B" BorderThickness="2" FontWeight="Bold" Width="130" Padding="0,6" Margin="0" HorizontalAlignment="Right" Canvas.Left="150" Height="36" FontSize="18"/>
                             </Canvas>
                         </StackPanel>
                     </TabItem>
@@ -215,19 +241,19 @@
                         <StackPanel Margin="10">
                             <Canvas Width="280" Height="40">
                                 <TextBlock Text="激发电压(V)  "  FontWeight="Bold" FontSize="20" Padding="0,6" HorizontalAlignment="Left" Canvas.Left="0" Width="120" Height="40"/>
-                                <TextBox Text="300"  x:Name="exciVolt" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Background="{x:Null}" BorderBrush="#FF0C0B0B" BorderThickness="2" FontWeight="Bold" Width="130" Padding="0,6" Margin="0" HorizontalAlignment="Right" Canvas.Left="120" Height="36"/>
+                                <TextBox Text="300"  x:Name="exciVolt" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Background="{x:Null}" BorderBrush="#FF0C0B0B" BorderThickness="2" FontWeight="Bold" Width="130" Padding="0,6" Margin="0" HorizontalAlignment="Right" Canvas.Left="120" Height="36" FontSize="18"/>
                             </Canvas>
                             <Canvas Width="280" Height="40">
                                 <TextBlock Text="脉冲宽度(ns)  "  FontWeight="Bold"  FontSize="20" Padding="0,6" HorizontalAlignment="Left" Canvas.Left="0" Width="125" Height="40"/>
-                                <TextBox Text="250" x:Name="pulsWidt" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Background="{x:Null}" BorderBrush="#FF0C0B0B" BorderThickness="2" FontWeight="Bold" Width="125" Padding="0,6" Margin="0" HorizontalAlignment="Right" Canvas.Left="125" Height="36"/>
+                                <TextBox Text="250" x:Name="pulsWidt" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Background="{x:Null}" BorderBrush="#FF0C0B0B" BorderThickness="2" FontWeight="Bold" Width="125" Padding="0,6" Margin="0" HorizontalAlignment="Right" Canvas.Left="125" Height="36" FontSize="18"/>
                             </Canvas>
                             <Canvas Width="280" Height="40">
                                 <TextBlock Text="激励频率(Hz)  " FontWeight="Bold" FontSize="20" Padding="0,6" HorizontalAlignment="Left" Canvas.Left="0" Width="125" Height="40"/>
-                                <TextBox Text="50"  x:Name="prf" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Background="{x:Null}" BorderBrush="#FF0C0B0B" BorderThickness="2" FontWeight="Bold" Width="125" Padding="0,6" Margin="0" HorizontalAlignment="Right" Canvas.Left="125" Height="36"/>
+                                <TextBox Text="50"  x:Name="prf" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Background="{x:Null}" BorderBrush="#FF0C0B0B" BorderThickness="2" FontWeight="Bold" Width="125" Padding="0,6" Margin="0" HorizontalAlignment="Right" Canvas.Left="125" Height="36" FontSize="18"/>
                             </Canvas>
                             <Canvas Width="280" Height="40">
                                 <TextBlock Text="阻尼(Ω)  " FontWeight="Bold" FontSize="20" Padding="0,6" HorizontalAlignment="Left" Canvas.Left="0" Width="80" Height="40"/>
-                                <TextBox Text="400" x:Name="damping" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Background="{x:Null}" BorderBrush="#FF0C0B0B" BorderThickness="2" FontWeight="Bold" Width="170" Padding="0,6" Margin="0" HorizontalAlignment="Right" Canvas.Left="80" Height="36"/>
+                                <TextBox Text="400" x:Name="damping" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Background="{x:Null}" BorderBrush="#FF0C0B0B" BorderThickness="2" FontWeight="Bold" Width="170" Padding="0,6" Margin="0" HorizontalAlignment="Right" Canvas.Left="80" Height="36" FontSize="18"/>
                             </Canvas>
                             <Canvas Width="280" Height="40">
                                 <TextBlock Text="带宽  " FontWeight="Bold" FontSize="20" Padding="0,6" HorizontalAlignment="Left" Canvas.Left="0" Width="60" Height="40"/>
@@ -235,15 +261,19 @@
                             </Canvas>
                             <Canvas Width="280" Height="40">
                                 <TextBlock Text="增益  "  FontWeight="Bold" FontSize="20" Padding="0,6" HorizontalAlignment="Left" Canvas.Left="0" Width="60" Height="40"/>
-                                <TextBox Text="20" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Background="{x:Null}" BorderBrush="#FF0C0B0B" BorderThickness="2" FontWeight="Bold" Width="190" Padding="0,6" Margin="0" HorizontalAlignment="Right" Canvas.Left="60" Height="36"/>
+                                <TextBox Text="20" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Background="{x:Null}" BorderBrush="#FF0C0B0B" BorderThickness="2" FontWeight="Bold" Width="190" Padding="0,6" Margin="0" HorizontalAlignment="Right" Canvas.Left="60" Height="36" FontSize="18"/>
                             </Canvas>
                         </StackPanel>
 
                     </TabItem>
                 </TabControl>
-                <TextBlock Text="操作面板" FontSize="24"/>
+
+                <StackPanel Orientation="Horizontal">
+                    <Image Source="Resources\operation.png"/>
+                    <TextBlock Text=" 操作面板" FontWeight="Bold" FontSize="20" Padding="0,5,0,5"/>
+                </StackPanel>
                 <StackPanel>
-                    <ToggleButton x:Name="LockWaveBtn" Background="#70AD47" Content="锁定波形" HorizontalAlignment="Center" VerticalAlignment="Center" Width="207" Height="37" FontSize="18" UseLayoutRounding="True" FontWeight="Medium" Foreground ="#FFF7F4F4" Padding="0" Margin="0,20,0,8" Checked="LockWaveBtn_Checked" Unchecked="LockWaveBtn_Unchecked"/>
+                    <ToggleButton x:Name="LockWaveBtn" Background="#70AD47" Content="锁定波形" HorizontalAlignment="Center" VerticalAlignment="Center" Width="207" Height="37" FontSize="18" UseLayoutRounding="True" FontWeight="Medium" Foreground ="#FFF7F4F4" Padding="0" Margin="0,10,0,8" Checked="LockWaveBtn_Checked" Unchecked="LockWaveBtn_Unchecked"/>
                     <ToggleButton x:Name="StartBtn" Background="#70AD47" Content="开始测量" HorizontalAlignment="Center" VerticalAlignment="Center" Width="207" Height="37" FontSize="18" UseLayoutRounding="True" FontWeight="Medium" Foreground ="#FFF7F4F4" Padding="0" Margin="0,8" Checked="StartBtn_Checked" Unchecked="StartBtn_Unchecked"/>
                     <Button x:Name="SingleLogBtn" Background="#70AD47" Content="单点记录" HorizontalAlignment="Center" VerticalAlignment="Center" Width="207" Height="37" FontSize="18" UseLayoutRounding="True" FontWeight="Medium" Foreground ="#FFF7F4F4" Padding="0" Margin="0,8" Click="SingleLogBtn_Click"/>
                     <ToggleButton x:Name="RealtimeLogBtn" Background="#70AD47" Content="实时记录" HorizontalAlignment="Center" VerticalAlignment="Center" Width="207" Height="37" FontSize="18" UseLayoutRounding="True" FontWeight="Medium" Foreground ="#FFF7F4F4" Padding="0" Margin="0,8"/>

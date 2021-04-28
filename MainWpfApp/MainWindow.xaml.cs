@@ -87,7 +87,9 @@ namespace MainWpfApp {
             NavigationWindow window = new NavigationWindow
             {
                 Source = new Uri("BoltDataShowPage.xaml", UriKind.Relative),
-                Owner = this
+                Title = "数据库",
+                Owner = this,
+
             };
             window.ShowDialog();
         }
@@ -259,22 +261,26 @@ namespace MainWpfApp {
             }
             try
             {
+                index = 1;
                 string start = startTime.ToString();
                 string end = endTime.ToString();
+                // 清除原来的点
                 stressPlotModel.points.Clear();
+                stressPlotModel.stressPlot.InvalidatePlot(true);
                 string sql = string.Format(
                     "SELECT * FROM t_bolt_logs " +
                     "WHERE Bolt_id='{0}' " +
                     "and TestTime > '{1}' " +
                     "and TestTime <= '{2}' " +
-                    "ORDER BY TestTime DESC " + 
+                    "ORDER BY TestTime DESC " +
                     "LIMIT {3};",
                     CurrentBolt.Bolt_id, start, end, count);
                 List<BoltLogModel> boltLogs = db.Query<BoltLogModel>(sql);
                 boltLogs.Reverse();
-                float maxY = -10000000;
-                float minY = 10000000;
-                foreach (BoltLogModel boltLog in boltLogs) {
+                float maxY = -10000;
+                float minY = 10000;
+                foreach (BoltLogModel boltLog in boltLogs)
+                {
                     maxY = Math.Max(maxY, boltLog.AxialForce);
                     minY = Math.Min(minY, boltLog.AxialForce);
                     stressPlotModel.points.Add(new StressLogPoint(index, boltLog.AxialForce, boltLog.TestTime, boltLog.TimeDelay, boltLog.MaxXcorr, boltLog.Id));
@@ -283,12 +289,19 @@ namespace MainWpfApp {
                 }
                 stressPlotModel.xAxis.Maximum = index + 10;
                 stressPlotModel.xAxis.Reset();
+                stressPlotModel.yAxis.Maximum = maxY + 400;
+                stressPlotModel.yAxis.Minimum = minY - 200;
                 stressPlotModel.yAxis.Reset();
             }
-            catch (SQLiteException) {
+            catch (SQLiteException)
+            {
                 db.Rollback();
                 MessageBox.Show("获取测量记录失败，请重试！");
             }
+            catch (Exception) {
+                MessageBox.Show("获取测量记录失败，请重试！");
+            }
+
         }
 
         /// <summary>
@@ -463,6 +476,51 @@ namespace MainWpfApp {
                 MessageBox.Show("发生异常，请重启！");
             }
 
+        }
+
+        private void StartTimeBtn_MouseDown(object sender, MouseButtonEventArgs e) {
+            
+            if(StartDateCal.Visibility == Visibility.Hidden)
+            {
+                StartDateCal.Visibility = Visibility.Visible;
+                return;
+            } else if(StartDateCal.Visibility == Visibility.Visible)
+            {
+                StartDateCal.Visibility = Visibility.Hidden;
+                if(StartDateCal.SelectedDate.HasValue) {
+                    DateTime dateTime = StartDateCal.SelectedDate.Value;
+                    StartTimeText.Text = dateTime.Year.ToString() + "-" + dateTime.Month.ToString() + "-" + dateTime.Day.ToString();
+                }
+            }
+        }
+
+        private void EndTimeBtn_MouseDown(object sender, MouseButtonEventArgs e) {
+            if (EndDateCal.Visibility == Visibility.Hidden)
+            {
+                EndDateCal.Visibility = Visibility.Visible;
+                return;
+            }
+            else if (EndDateCal.Visibility == Visibility.Visible)
+            {
+                EndDateCal.Visibility = Visibility.Hidden;
+                if (EndDateCal.SelectedDate.HasValue) {
+                    DateTime dateTime = EndDateCal.SelectedDate.Value;
+                    EndTimeText.Text = dateTime.Year.ToString() + "-" + dateTime.Month.ToString() + "-" + dateTime.Day.ToString();
+                }
+            }
+        }
+
+        private void SearchLogsBtn_MouseDown(object sender, MouseButtonEventArgs e) {
+            if (CurrentBolt == null || CurrentBolt.Bolt_id == null)
+            {
+                MessageBox.Show("请先选择螺栓！");
+                return;
+            }
+            if (!IsTesting)
+            {
+                MessageBox.Show("未在测量过程中！");
+                return;
+            }
         }
     }
     

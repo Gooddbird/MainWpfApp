@@ -12,9 +12,12 @@ namespace MainWpfApp {
         public BoltDataShowPage() {
             InitializeComponent();
             BoltList = mainwin.db.Bolts.ToList();
-            BoltsTable.ItemsSource = BoltList; 
+            BoltLogList = mainwin.db.BoltLogs.ToList();
+            BoltsTable.ItemsSource = BoltList;
+            BoltLogsTable.ItemsSource = BoltLogList;
         }
         public List<BoltModel> BoltList = new List<BoltModel>();        // 当前螺栓列表 绑定前端datagrid控件 随时变换
+        public List<BoltLogModel> BoltLogList = new List<BoltLogModel>();
         public static MainWindow mainwin = (MainWindow)Application.Current.MainWindow;
 
         /// <summary>
@@ -24,30 +27,8 @@ namespace MainWpfApp {
         /// <param name="e"></param>
         private void BackBtn_Click(object sender, RoutedEventArgs e) {
 
-            
             Window win = (Window)this.Parent;
             win.Close();
-        }
-
-        private void SaveBtn_Click(object sender, RoutedEventArgs e) {
-            try {
-                // 删除
-                foreach (BoltModel t in GetDelBolts(BoltList, mainwin.db.Bolts.ToList())) {
-                    mainwin.db.Delete(t);
-                }
-
-                // 新增或修改
-                foreach (BoltModel t in BoltList) {
-                    mainwin.db.InsertOrReplace(t);
-                }
-                mainwin._BoltList = mainwin.db.Bolts.ToList();
-                var win = (MainWindow)Application.Current.MainWindow;
-                win.BuildBoltComboList(0);
-            }
-            catch (SQLiteException) {
-                mainwin.db.Rollback();
-                MessageBox.Show("更新失败，请重试！");
-            }
         }
 
         /// <summary>
@@ -64,6 +45,31 @@ namespace MainWpfApp {
                 }
             }
             return re;
+        }
+
+        private void SaveBtn_Click(object sender, RoutedEventArgs e) {
+            try
+            {
+                // 删除
+                foreach (BoltModel t in GetDelBolts(BoltList, mainwin.db.Bolts.ToList()))
+                {
+                    mainwin.db.Delete(t);
+                }
+
+                // 新增或修改
+                foreach (BoltModel t in BoltList)
+                {
+                    mainwin.db.InsertOrReplace(t);
+                }
+                mainwin._BoltList = mainwin.db.Bolts.ToList();
+                var win = (MainWindow)Application.Current.MainWindow;
+                win.BuildBoltComboList(0);
+            }
+            catch (SQLiteException)
+            {
+                mainwin.db.Rollback();
+                MessageBox.Show("更新失败，请重试！");
+            }
         }
     }
 }

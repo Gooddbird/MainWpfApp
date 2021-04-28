@@ -28,6 +28,7 @@ namespace MainWpfApp.ViewModels {
         }
 
         public void Init() {
+            stressPlot.Title = "轴力测量结果";
             points = new List<StressLogPoint>();
             mainwin.StressPlot.DataContext = this;
             var start =  DateTimeAxis.ToDouble(DateTime.Today);
