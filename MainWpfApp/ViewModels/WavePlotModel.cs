@@ -63,35 +63,6 @@ namespace MainWpfApp.ViewModels {
             LWavePlotModel.Axes.Add(xAxisL);
             LWavePlotModel.Title = "纵波波形";
             
-
-
-            /** 横波波形图 **/
-            //var yAxisT = new LinearAxis()
-            //{
-            //    /* y轴 */
-            //    Position = AxisPosition.Left,
-            //    Minimum = -100,
-            //    Maximum = 100,
-            //    Title = "回波强度",
-            //    TitlePosition = 0.5,
-            //    MinorGridlineStyle = LineStyle.Solid,
-            //    MajorGridlineStyle = LineStyle.Solid,
-            //};
-            //var xAxisT = new LinearAxis()
-            //{
-            //    /* x轴 */
-            //    Position = AxisPosition.Bottom,
-            //    Minimum = 0,
-            //    Maximum = MaxWaveSize, 
-            //    Title = "长度",
-            //    TitlePosition = 0.5,
-            //    MinorGridlineStyle = LineStyle.Solid,
-            //    MajorGridlineStyle = LineStyle.Solid,
-            //};
-            //TWavePlotModel.Axes.Add(yAxisT);
-            //TWavePlotModel.Axes.Add(xAxisT);
-            //TWavePlotModel.Title = "横波波形";
-            
             PrintStressWave();
             PrintZeroStressWave();
         }
@@ -102,24 +73,7 @@ namespace MainWpfApp.ViewModels {
         public void PrintZeroStressWave() {
             // 纵波零力波形绘制
             zeroWave = new LineSeries() { Title = "参考波形", InterpolationAlgorithm = InterpolationAlgorithms.CanonicalSpline };
-            //int i = 0;
-            //var zeroWaveList = mainwin.ustBolt.ustbData.lstuintZeroWaveDataBuff[0];
-            //Task.Factory.StartNew(() => {
-            //    while (true)
-            //    {
-            //        if (zeroWaveList == null)
-            //        {
-            //            Thread.Sleep(500);
-            //            continue;
-            //        }
-            //        if (i == MaxWaveSize)
-            //        {
-            //            break;
-            //        }
-            //        zeroWave.Points.Add(new DataPoint(i, zeroWaveList[i]));
-            //        i++;
-            //    }
-            //});
+
             LWavePlotModel.Series.Add(zeroWave);
         }
 
@@ -152,7 +106,7 @@ namespace MainWpfApp.ViewModels {
         /// <returns></returns>
         public int GetLWaveXEnd() {
             int end = (int)xAxisL.ActualMaximum;
-            if (end >= 0 && end < MaxWaveSize) {
+            if (end > 0 && end < MaxWaveSize) {
                 return end;
             }
             return MaxWaveSize; 

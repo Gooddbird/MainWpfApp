@@ -22,22 +22,36 @@ public class TcpClient
 
         public void tcpConnect()
         {
-            try
-            {
-                //创建用于通讯的socket
-                socketsend = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+                try {
+                    //while (tcpConnFlag != 1)
+                    //{
+                        socketsend = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+                        // socketsend.Blocking = false;
 
-                //连接对应的端口
-                IPAddress ip = IPAddress.Parse(ipStr);
-                IPEndPoint port = new IPEndPoint(ip, Convert.ToInt32(portStr));
-                socketsend.Connect(port);
-                Console.WriteLine(socketsend.RemoteEndPoint + ": 连接成功!");
-                tcpConnFlag = 1;
-            }
-            catch {
-                Console.WriteLine(socketsend.RemoteEndPoint + ": 连接失败!");
-            }
+                        //连接对应的端口
+                        IPAddress ip = IPAddress.Parse(ipStr);
+                        IPEndPoint port = new IPEndPoint(ip, Convert.ToInt32(portStr));
+                        socketsend.Connect(port);
+                        if (socketsend.Connected == true)
+                        {
+                            Console.WriteLine(socketsend.RemoteEndPoint + ": 连接成功!");
+                            tcpConnFlag = 1;
+                            return;
+                        }
+                    //}
+                
+                }
+                catch
+                {
+                    Console.WriteLine(socketsend.RemoteEndPoint + ": 连接失败!");
+                }
+
         }
+
+    public void tcpConnectThreadStart() {
+        Thread tcpCon = new Thread(tcpConnect);
+        tcpCon.Start();
+    }
 
         //开辟TCP线程
         public void tcpClientThreadStart()

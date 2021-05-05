@@ -1,17 +1,16 @@
 ﻿using MainWpfApp.Util;
 using MainWpfApp.ViewModels;
-using OxyPlot.Axes;
 using SQLite;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.Globalization;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Navigation;
+using System.Timers;
 
 namespace MainWpfApp {
     /// <summary>
@@ -26,7 +25,7 @@ namespace MainWpfApp {
         public List<BoltModel> _BoltList = new List<BoltModel>();           // 螺栓列表
         public WavePlotModel wavePlotModel { get; set; }
         public StressPlotModel stressPlotModel { get; set; }
-        public USTBolt ustBolt; 
+        public USTBolt CurrentUstBolt; 
         public bool IsLockWave = false;                                     // 是否锁定波形 默认为否
         public bool IsTesting = false;                                     // 是否正在测量
         public event PropertyChangedEventHandler PropertyChanged;
@@ -34,21 +33,71 @@ namespace MainWpfApp {
         public int WaveUpdateDelay = 200;                                   // 波形更新频率控制
         public string Proj_name;                                            // 工程名字
         public int index = 1;                                               // 当前测量结果横坐标
+        public bool IsRealtimeLog = false;                                  // 是否实时测量
+        public System.Timers.Timer timer = new System.Timers.Timer();
+        public ProgressWindow progressWindow;
 
         public MainWindow() {
             Application.Current.MainWindow = this;
+           // while (window.IsCompleted == false) { }
             InitializeComponent();
+            InitObjects();
+            InitConnection();
+            InitPlotModel();
+
+            //// 等待获取第一个波形数据
+            while (CurrentUstBolt.ustbData.IsCanStartCal == false) { };
+            StartBtn.IsChecked = true;
+
+            //progressWindow = new ProgressWindow();
+            //progressWindow.ShowDialog();
+            //Progress();
+            // window.ProgressBegin(CurrentUstBolt);
+        }
+
+
+        //public void Progress() {
+        //    Thread thread = new Thread(new ThreadStart(() =>
+        //    {
+        //        for (int i = 0; i <= 100; i++)
+        //        {
+        //            if (CurrentUstBolt.ustbData.IsCanStartCal == true)
+        //            {
+        //                progressWindow.progressBar1.Dispatcher.BeginInvoke((ThreadStart)delegate { progressWindow.progressBar1.Value = 100; });
+        //                Thread.Sleep(1000);
+        //                break;
+        //            }
+        //            progressWindow.progressBar1.Dispatcher.BeginInvoke((ThreadStart)delegate { progressWindow.progressBar1.Value = i; });
+        //            Thread.Sleep(300);
+        //        }
+        //        // this.Close();
+
+        //    }));
+        //    thread.Start();
+
+        //}
+
+        /// <summary>
+        /// 初始化数据源、UI、绑定对象 
+        /// </summary>
+        private void InitObjects() {
             BoltComboList.ItemsSource = null;
             CurrentBolt = new BoltModel();
             Bolt_Para.DataContext = CurrentBolt;
             BuildBoltComboList(-1);
-            ustBolt = new USTBolt();
-            Init();
-            InitWave();
-            InitStressPlot();
+            CurrentUstBolt = new USTBolt();
+            CurrentUstBolt.USTBDataInit();
             Proj_Name.DataContext = Proj_name;
-        }
 
+            DateTime dateTime = DateTime.Now;
+            DateTime start = dateTime.AddDays(-7);
+            EndDateCal.SelectedDate = dateTime;
+            EndTimeText.Text = dateTime.Year.ToString() + "-" + dateTime.Month.ToString() + "-" + dateTime.Day.ToString();
+
+            StartDateCal.SelectedDate = start;
+            StartTimeText.Text = start.Year.ToString() + "-" + start.Month.ToString() + "-" + start.Day.ToString();
+
+        }
 
         /// <summary>
         /// 按键监听
@@ -89,7 +138,6 @@ namespace MainWpfApp {
                 Source = new Uri("BoltDataShowPage.xaml", UriKind.Relative),
                 Title = "数据库",
                 Owner = this,
-
             };
             window.ShowDialog();
         }
@@ -202,6 +250,9 @@ namespace MainWpfApp {
         public void ConnectDB() {
             try
             {
+                if (Proj_path == null || Proj_path == "") {
+                    return;
+                }
                 db = new DbConnection(Proj_path);
                 _BoltList = db.Bolts.ToList();
                 BuildBoltComboList(0);
@@ -307,46 +358,27 @@ namespace MainWpfApp {
         /// <summary>
         /// 初始化波形
         /// </summary>
-        private void InitWave() {
+        private void InitPlotModel() {
             wavePlotModel = new WavePlotModel();
             wavePlotModel.Init();
-        }
-
-        private void InitStressPlot() {
             stressPlotModel = new StressPlotModel();
             stressPlotModel.Init();
         }
-
         
         /// <summary>
         /// 初始化 连接板卡 下发板卡参数 开启tcp线程从板卡获取实时波形数据 
         /// </summary>
-        private void Init() {
-            /*************初始化**************/
-            ustBolt.USTBDataInit();
-            /*************连接板卡**************/
-            while (true)
-            {
-                ustBolt.tcpConnect();
-                if (ustBolt.tcpConnFlag == 1)
-                {
-                    break;
-                }
-                else
-                {
-                    Console.WriteLine("tcp connecting!");
-                }
+        private void InitConnection() {
+            while (CurrentUstBolt.tcpConnFlag != 1) {
+                CurrentUstBolt.tcpConnect();
             }
+            /*************连接板卡**************/
+            CurrentUstBolt.tcpConnectThreadStart();
             // 开启UI线程
             StartUIThread();
             // 开启tcp线程获取板卡回送数据
-            ustBolt.tcpClientThreadStart();
+            CurrentUstBolt.tcpClientThreadStart();
             /*************写入参数**************/
-            //写入基准波形
-            //double[] waveDataTmp = ustBolt.utsMath.readCsvZeroWaveData(@"C:\Users\hhhhh\Desktop\design\Project\USTBolt_Client\SimWaveData8178.csv");
-            //Array.Copy(waveDataTmp, ustBolt.ustbData.lstuintZeroWaveDataBuff[0], waveDataTmp.Length);
-            //Array.Copy(waveDataTmp, ustBolt.ustbData.lstuintZeroWaveDataBuff[1], waveDataTmp.Length);
-
         }
 
 
@@ -359,7 +391,7 @@ namespace MainWpfApp {
             Task.Factory.StartNew(() => {
                 while (true)
                 {
-                    if (ustBolt.tcpConnFlag == 0)
+                    if (CurrentUstBolt.tcpConnFlag == 0)
                     {
                         Thread.Sleep(5000);
                     }
@@ -368,19 +400,19 @@ namespace MainWpfApp {
                         // 注：子线程要获取主线程UI 需经过Dispacther.Invoke
                         Application.Current.Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Background,
                             new Action(() => {
-                                AxialForce.Text = ustBolt.ustbData.axialForce.ToString();
-                                TimeDelay.Text = ustBolt.ustbData.timeDelay.ToString();
-                                MaxXcorr.Text = ustBolt.ustbData.maxXcorr.ToString();
-                                ustBolt.ustbData.pulsWidt = Convert.ToDouble(pulsWidt.Text);
-                                ustBolt.ustbData.exciVolt = Convert.ToDouble(exciVolt.Text);
-                                ustBolt.ustbData.prf = Convert.ToDouble(prf.Text);
-                                ustBolt.ustbData.damping = Convert.ToDouble(damping.Text);
-                                ustBolt.ustbData.Ks= Convert.ToDouble(Ks.Text);
-                                ustBolt.ustbData.KT= Convert.ToDouble(KT.Text);
-                                ustBolt.ustbData.T0= Convert.ToDouble(ZeroTem.Text);
-                                ustBolt.ustbData.T1= Convert.ToDouble(TestTem.Text);
+                                AxialForce.Text = CurrentUstBolt.ustbData.axialForce.ToString();
+                                TimeDelay.Text = CurrentUstBolt.ustbData.timeDelay.ToString();
+                                MaxXcorr.Text = CurrentUstBolt.ustbData.maxXcorr.ToString();
+                                CurrentUstBolt.ustbData.pulsWidt = Convert.ToDouble(pulsWidt.Text);
+                                CurrentUstBolt.ustbData.exciVolt = Convert.ToDouble(exciVolt.Text);
+                                CurrentUstBolt.ustbData.prf = Convert.ToDouble(prf.Text);
+                                CurrentUstBolt.ustbData.damping = Convert.ToDouble(damping.Text);
+                                CurrentUstBolt.ustbData.Ks= Convert.ToDouble(Ks.Text);
+                                CurrentUstBolt.ustbData.KT= Convert.ToDouble(KT.Text);
+                                CurrentUstBolt.ustbData.T0= Convert.ToDouble(ZeroTem.Text);
+                                CurrentUstBolt.ustbData.T1= Convert.ToDouble(TestTem.Text);
                             }));
-                        ustBolt.setPara();
+                        CurrentUstBolt.setPara();
                         Thread.Sleep(1000);
                     }
                 }
@@ -424,31 +456,41 @@ namespace MainWpfApp {
         /// <param name="e"></param>
         private void StartBtn_Checked(object sender, RoutedEventArgs e) {
             IsLockWave = false;
+            LockWaveBtn.IsChecked = false;
             IsTesting = true;
-            ustBolt.ustbData.LWaveTDEStart = wavePlotModel.GetLWaveXStart();
-            ustBolt.ustbData.LWaveTEDEnd = wavePlotModel.GetLWaveXEnd();
-            ustBolt.StartStressCalThread();
+            CurrentUstBolt.ustbData.LWaveTDEStart = wavePlotModel.GetLWaveXStart();
+            CurrentUstBolt.ustbData.LWaveTEDEnd = wavePlotModel.GetLWaveXEnd();
+            CurrentUstBolt.StartStressCalThread();
         }
 
         private void StartBtn_Unchecked(object sender, RoutedEventArgs e) {
             IsTesting = false;
         }
 
-        private void SingleLogBtn_Click(object sender, RoutedEventArgs e) {
-            if (CurrentBolt == null || CurrentBolt.Bolt_id == null) {
-                MessageBox.Show("请先选择螺栓！");
-                return;
-            }
-            if (!IsTesting) {
-                MessageBox.Show("未在测量过程中！");
-                return;
-            }
+        /// <summary>
+        /// 记录一次结果
+        /// </summary>
+        private void SingleLog(bool testType) {
             try
             {
                 DateTime nowTime = DateTime.Now;
-                double force = Convert.ToDouble(AxialForce.Text);
-                double timeDelay = Convert.ToDouble(TimeDelay.Text);
-                double maxXcorr = Convert.ToDouble(MaxXcorr.Text);
+                double force;
+                double timeDelay;
+                double maxXcorr;
+                /// 单点记录时 为确保实时性 记录值为当前UI界面显示值 
+                /// 实时记录时 因为非主线程不方便获取UI元素值 直接存实时计算结果值
+                if (testType == true)
+                {
+                    force = Convert.ToDouble(AxialForce.Text);
+                    timeDelay = Convert.ToDouble(TimeDelay.Text);
+                    maxXcorr = Convert.ToDouble(MaxXcorr.Text);
+                }
+                else {
+                    force = CurrentUstBolt.ustbData.axialForce;
+                    timeDelay = CurrentUstBolt.ustbData.timeDelay;
+                    maxXcorr = CurrentUstBolt.ustbData.maxXcorr;
+                }
+
                 // 插入记录到db
                 CurrentBoltLog = new BoltLogModel
                 {
@@ -468,14 +510,38 @@ namespace MainWpfApp {
             }
             catch (SQLiteException)
             {
+                timer.Enabled = false;
                 Console.WriteLine("insert exception!, sql: ");
                 MessageBox.Show("发生异常，请重试！");
                 db.Rollback();
             }
-            catch (Exception) {
+            catch (Exception e)
+            {
+                timer.Enabled = false;
+                Console.WriteLine(e.ToString());
                 MessageBox.Show("发生异常，请重启！");
             }
+        }
 
+        /// <summary>
+        /// 单点记录按钮点击事件
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void SingleLogBtn_Click(object sender, RoutedEventArgs e) {
+            if (CurrentBolt == null || CurrentBolt.Bolt_id == null) {
+                MessageBox.Show("请先选择螺栓！");
+                return;
+            }
+            if (!IsTesting) {
+                MessageBox.Show("未在测量过程中！");
+                return;
+            }
+            if (IsRealtimeLog) {
+                MessageBox.Show("正在实时记录！");
+                return;
+            }
+            SingleLog(true);
         }
 
         private void StartTimeBtn_MouseDown(object sender, MouseButtonEventArgs e) {
@@ -516,12 +582,78 @@ namespace MainWpfApp {
                 MessageBox.Show("请先选择螺栓！");
                 return;
             }
+            DateTime start;
+            DateTime end;
+            int count = 30;
+            if (StartDateCal.SelectedDate.HasValue)
+            {
+                start = StartDateCal.SelectedDate.Value;
+                count = 10000;
+            }
+            else {
+                start = DateTime.Today.AddDays(-7);
+            }
+            if (EndDateCal.SelectedDate.HasValue)
+            {
+                end = EndDateCal.SelectedDate.Value;
+            }
+            else {
+
+                end = DateTime.Now;
+            }
+            UpdateStressPlot(start, end, count);
+        }
+
+        private void RealtimeLog(object sender, System.Timers.ElapsedEventArgs e) {
+
+            if (!IsTesting)
+            {
+                MessageBox.Show("未在测量过程中。实时记录停止！");
+                RealtimeLogBtn.IsChecked = false;
+                timer.Enabled = false;
+                return;
+            }
+            SingleLog(false);
+        }
+
+        private void RealtimeLogBtn_Checked(object sender, RoutedEventArgs e) {
+            if (CurrentBolt == null || CurrentBolt.Bolt_id == null)
+            {
+                MessageBox.Show("请先选择螺栓！");
+                RealtimeLogBtn.IsChecked = false;
+                return;
+            }
             if (!IsTesting)
             {
                 MessageBox.Show("未在测量过程中！");
+                RealtimeLogBtn.IsChecked = false;
                 return;
             }
+            IsRealtimeLog = true;
+            timer.Interval = 500;
+            timer.Enabled = true;
+            timer.Elapsed += new ElapsedEventHandler(RealtimeLog);
+            timer.Start();
         }
+
+        private void RealtimeLogBtn_Unchecked(object sender, RoutedEventArgs e) {
+            IsRealtimeLog = false;
+            timer.Enabled = false;
+        }
+
+        //private void ConnectBtn_Click(object sender, RoutedEventArgs e) {
+
+        //    //progressWindow = new ProgressWindow();
+        //   // progressWindow.ShowDialog();
+
+
+        //    InitConnection();
+        //    InitPlotModel();
+        //    // 等待获取第一个波形数据
+        //    //while (CurrentUstBolt.ustbData.IsCanStartCal == false) { };
+        //    //StartBtn.IsChecked = true;
+
+        //}
     }
     
 }

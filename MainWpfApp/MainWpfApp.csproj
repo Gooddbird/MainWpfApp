@@ -137,6 +137,9 @@
     <Compile Include="BoltDataShowPage.xaml.cs">
       <DependentUpon>BoltDataShowPage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="ProgressWindow.xaml.cs">
+      <DependentUpon>ProgressWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="USTBoltClient\Program.cs" />
     <Compile Include="USTBoltClient\TcpClient.cs" />
     <Compile Include="USTBoltClient\USTBolt.cs" />
@@ -164,6 +167,10 @@
       <SubType>Code</SubType>
     </Compile>
     <Page Include="BoltDataShowPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ProgressWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -261,6 +268,19 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\table.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\lock.png" />
+    <Resource Include="Resources\point.png" />
+    <Resource Include="Resources\test.png" />
+    <Resource Include="Resources\time.png" />
+    <Resource Include="Resources\unlock.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\delete.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\connect.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\SQLitePCLRaw.lib.e_sqlite3.2.0.4\build\net461\SQLitePCLRaw.lib.e_sqlite3.targets" Condition="Exists('..\packages\SQLitePCLRaw.lib.e_sqlite3.2.0.4\build\net461\SQLitePCLRaw.lib.e_sqlite3.targets')" />

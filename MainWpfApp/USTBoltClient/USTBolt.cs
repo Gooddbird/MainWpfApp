@@ -13,7 +13,7 @@ public class USTBolt : TcpClient
     int ChNum = 2; //通道数
     public int MAXWAVESIZE = 8178;//最大波形深度
     double sampleTime = 5; //采样间隔 ns
-    bool isZeroBuf = true;  // 当前采集数据是否为零应力波形数据
+    bool IsZeroBuf = true;  // 当前采集数据是否为零应力波形数据
 
     //参数结构体
     public struct USTBData
@@ -68,7 +68,7 @@ public class USTBolt : TcpClient
         public double lowCutOff; //低截至频率 Hz 固定
         public double highCutOff; //高截至频率 Hz 固定
 
-        // public bool isZeroBuf;
+        public bool IsCanStartCal; // 是否可以开始测量
 
     };
     public USTBData ustbData;
@@ -152,7 +152,9 @@ public class USTBolt : TcpClient
         ustbData.lowCutOff = 0.5e6; //滤波 低截至频率 Hz
         ustbData.highCutOff = 10e6; //滤波 高截至频率 Hz
 
-       // ustbData.isZeroBuf = true;
+        ustbData.IsCanStartCal = false;
+
+       // ustbData.IsZeroBuf = true;
     }
 
     /**
@@ -316,6 +318,10 @@ public class USTBolt : TcpClient
                     int LWavaChIndx = ustbData.LWavaChIndx;
                     int LwaveLen = ustbData.lstWaveDataLen[LWavaChIndx];
                     int LwaveTDELen = ustbData.LWaveTEDEnd - ustbData.LWaveTDEStart;
+                    if (LwaveLen == 0 || LwaveTDELen == 0) {
+                        Thread.Sleep(100);
+                        continue;
+                    }
                     double[] zeroWaveData = new double[LwaveTDELen];
                     double[] testWaveData = new double[LwaveTDELen];
                     Array.Copy(ustbData.lstuintWaveDataBuff[LWavaChIndx], ustbData.LWaveTDEStart, testWaveData, 0, LwaveTDELen);
@@ -415,25 +421,7 @@ public class USTBolt : TcpClient
                 ustbData.lstuintWaveDataBuff[ChInx][i] = bytesRead[i * 2 + 10] * 256 + bytesRead[i * 2 + 1 + 10] - 512;
                 //ustbData.lstuintWaveDataBuff[ChInx][i] = ustbData.lstuintWaveDataBuff[ChInx][i] / 512 * 100; //转化为100%
             }
-            if (isZeroBuf == true) {
-                // 零应力波形绘制
-                for(int j = 0; j < ChNum; j++)
-                {
-                    for (int t = 0; t < waveLen; t++) {
-                        ustbData.lstuintZeroWaveDataBuff[j][t] = ustbData.lstuintWaveDataBuff[j][t];
-                    }
-                }
-                var zeroWaveList = ustbData.lstuintZeroWaveDataBuff[0];
-                int i = 0;
-               // mainwin.wavePlotModel.zeroWave.Points.Clear();
-                while (i < waveLen)
-                {
-                    mainwin.wavePlotModel.zeroWave.Points.Add(new DataPoint(i, zeroWaveList[i]));
-                    i++;
-                }
-                mainwin.wavePlotModel.LWavePlotModel.InvalidatePlot(true);
-                isZeroBuf = false;
-            }
+            
             /*  绘图 */ 
             try
             {
@@ -450,12 +438,35 @@ public class USTBolt : TcpClient
                     i++;
                 }
                 mainwin.wavePlotModel.LWavePlotModel.InvalidatePlot(true);
+
+                // 零应力波形绘制
+                if (IsZeroBuf == true)
+                {
+                    for (int j = 0; j < ChNum; j++)
+                    {
+                        for (int t = 0; t < waveLen; t++)
+                        {
+                            ustbData.lstuintZeroWaveDataBuff[j][t] = ustbData.lstuintWaveDataBuff[j][t];
+                        }
+                    }
+                    var zeroWaveList = ustbData.lstuintZeroWaveDataBuff[0];
+                    i = 0;
+                    // mainwin.wavePlotModel.zeroWave.Points.Clear();
+                    while (i < waveLen)
+                    {
+                        mainwin.wavePlotModel.zeroWave.Points.Add(new DataPoint(i, zeroWaveList[i]));
+                        i++;
+                    }
+                    mainwin.wavePlotModel.LWavePlotModel.InvalidatePlot(true);
+                    IsZeroBuf = false;
+                }
+                ustbData.IsCanStartCal = true;
             }
             catch (Exception) {
                 mainwin.wavePlotModel.LWave.Points.Clear();
                 mainwin.wavePlotModel.LWavePlotModel.InvalidatePlot(true);
             }
-
+            
             getWaveSysTime = currentTimeMills(); //更新波形获取时间
             //其他操作 调试用
             //Console.WriteLine("波形数据格式解析完成，更新时间：" + getWaveSysTime.ToString());

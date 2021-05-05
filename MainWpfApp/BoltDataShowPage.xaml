@@ -6,7 +6,7 @@
       xmlns:local="clr-namespace:MainWpfApp"
       mc:Ignorable="d" 
       d:DesignHeight="450" d:DesignWidth="800"
-      Title="螺栓数据库" ShowsNavigationUI="False"  Background="White" Foreground="Black" WindowTitle="">
+      WindowTitle="数据库管理页面" ShowsNavigationUI="False"  Background="White" Foreground="Black"  KeyDown="Page_KeyDown" Unloaded="Page_Unloaded">
 
     <Grid>
         <Grid.RowDefinitions>
@@ -24,6 +24,12 @@
         <!--菜单-->
         <DockPanel Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="5" VerticalAlignment="Center">
             <Menu DockPanel.Dock="Top">
+
+                <MenuItem x:Name="BackBtn" Header="返回(B)" FontSize="16" Click="BackBtn_Click">
+                    <MenuItem.Icon>
+                        <Image Source="Resources/back.png"/>
+                    </MenuItem.Icon>
+                </MenuItem>
                 <MenuItem Header="数据库操作(D)" FontSize="16">
                     <MenuItem.Icon>
                         <Image Source="Resources/database.png"/>
@@ -32,12 +38,12 @@
                         <MenuItem.Icon>
                             <Image Source="Resources/pick.png"/>
                         </MenuItem.Icon>
-                        <MenuItem Header="螺栓数据表">
+                        <MenuItem x:Name="CheckBoltsTableBtn" Click="CheckBoltsTableBtn_Click" Header="螺栓数据表">
                             <MenuItem.Icon>
                                 <Image Source="Resources/table.png"/>
                             </MenuItem.Icon>
                         </MenuItem>
-                        <MenuItem Header="测量记录表">
+                        <MenuItem x:Name="CheckBoltLogsTableBtn" Click="CheckBoltLogsTableBtn_Click" Header="测量记录表">
                             <MenuItem.Icon>
                                 <Image Source="Resources/table.png"/>
                             </MenuItem.Icon>
@@ -48,16 +54,16 @@
                             <Image Source="Resources/commit.png"/>
                         </MenuItem.Icon>
                     </MenuItem>
-                    <MenuItem Header="刷新数据">
+                    <MenuItem x:Name="RefreshDataBtn" Click="RefreshDataBtn_Click" Header="刷新数据">
                         <MenuItem.Icon>
                             <Image Source="Resources/refresh.png"/>
                         </MenuItem.Icon>
                     </MenuItem>
                 </MenuItem>
                 
-                <MenuItem x:Name="BackBtn" Header="返回(B)" FontSize="16" Click="BackBtn_Click">
+                <MenuItem x:Name="DeleteBtn" Header="删除(D)" FontSize="16" Click="DeleteBtn_Click">
                     <MenuItem.Icon>
-                        <Image Source="Resources/back.png"/>
+                        <Image Source="Resources/delete.png"/>
                     </MenuItem.Icon>
                 </MenuItem>
                 <MenuItem Header="帮助(H)" FontSize="16">
@@ -69,7 +75,7 @@
         </DockPanel>
 
         
-        <DataGrid Visibility="Hidden" Name="BoltsTable" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" AutoGenerateColumns="False" FontSize="18" Margin="20,5,20,10">
+        <DataGrid x:Name="BoltsTable" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" AutoGenerateColumns="False" FontSize="18" Margin="20,5,20,10" CellEditEnding="BoltsTable_CellEditEnding" BeginningEdit="BoltsTable_BeginningEdit">
             <DataGrid.ColumnHeaderStyle>
                 <!--样式类型：DataGridColumnHeader（数据网格列标题）-->
                 <Style TargetType="{x:Type DataGridColumnHeader}">
@@ -126,8 +132,7 @@
             </DataGrid.Columns>
         </DataGrid>
 
-
-        <DataGrid Name="BoltLogsTable" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" AutoGenerateColumns="False" FontSize="18" Margin="20,5,20,10">
+        <DataGrid x:Name="BoltLogsTable" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" AutoGenerateColumns="False" FontSize="18" Margin="20,5,20,10" BeginningEdit="BoltLogsTable_BeginningEdit" CellEditEnding="BoltLogsTable_CellEditEnding">
             <DataGrid.ColumnHeaderStyle>
                 <!--样式类型：DataGridColumnHeader（数据网格列标题）-->
                 <Style TargetType="{x:Type DataGridColumnHeader}">
@@ -172,13 +177,15 @@
                 <DataGridTextColumn Header="波形相似度" Width="1.5*" Binding="{Binding MaxXcorr}" FontSize="18">
                 </DataGridTextColumn>
 
+                <DataGridTextColumn Header="测量时间" Width="1.5*" Binding="{Binding TestTime}" FontSize="18">
+                </DataGridTextColumn>
             </DataGrid.Columns>
         </DataGrid>
 
         <StackPanel Orientation="Horizontal" Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="2" Margin="20,5,0,0">
             <Image Source="Resources/table.png" Width="36" Height="36" HorizontalAlignment="Center" VerticalAlignment="Center">
             </Image>
-            <TextBlock x:Name="TableNameText" Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="1" Text="螺栓数据库" FontSize="30" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10,0,0,0"></TextBlock>
+            <TextBlock x:Name="TableNameText" Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="1" Text="螺栓数据表" FontSize="30" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10,0,0,0"></TextBlock>
         </StackPanel>
     </Grid>
 </Page>

@@ -1,0 +1,12 @@
+﻿<Window x:Class="MainWpfApp.ProgressWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:MainWpfApp"
+        mc:Ignorable="d"
+        Title="ProgressWindow" Height="200" Width="300">
+    <Grid>
+        <ProgressBar Height="24" HorizontalAlignment="Center" Margin="0,0,0,0" Name="progressBar1" VerticalAlignment="Center" Width="254" Foreground="#FF2EAFF1" />
+    </Grid>
+</Window>
