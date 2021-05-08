@@ -29,8 +29,8 @@ namespace MainWpfApp.Util {
                     string sql2 = "CREATE TABLE IF NOT EXISTS " + logTableName +
                         "(Id INTEGER PRIMARY KEY AUTOINCREMENT, " +
                         "Bolt_id VARCHAR NOT NULL, " +
-                        "AxialForce FLOAT NOT NULL, " +
-                        "TimeDelay FLOAT NOT NULL, " +
+                        "axialForce FLOAT NOT NULL, " +
+                        "timeDelay FLOAT NOT NULL, " +
                         "MaxXcorr FLOAT NOT NULL, " +
                         "CurrentTime VARCHAR NOT NULL);";
                     Execute(sql1);

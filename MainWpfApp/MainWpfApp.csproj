@@ -140,10 +140,10 @@
     <Compile Include="ProgressWindow.xaml.cs">
       <DependentUpon>ProgressWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="USTBoltClient\Program.cs" />
-    <Compile Include="USTBoltClient\TcpClient.cs" />
-    <Compile Include="USTBoltClient\USTBolt.cs" />
-    <Compile Include="USTBoltClient\UTSMath.cs" />
+    <Compile Include="BoltClient\Program.cs" />
+    <Compile Include="BoltClient\TcpClient.cs" />
+    <Compile Include="BoltClient\Bolt.cs" />
+    <Compile Include="BoltClient\BoltMath.cs" />
     <Compile Include="Util\DbConn.cs" />
     <Compile Include="Util\Util.cs" />
     <Compile Include="ViewModels\BoltLogModel.cs" />

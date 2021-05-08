@@ -33,13 +33,13 @@ namespace MainWpfApp.ViewModels {
         public float AxialForce {
             get { return _AxialForce; }
             set { _AxialForce = value;
-                OnPropertyChanged("AxialForce");
+                OnPropertyChanged("axialForce");
             }
         }
         public float TimeDelay{
             get { return _TimeDelay; }
             set { _TimeDelay= value;
-                OnPropertyChanged("AxialForce");
+                OnPropertyChanged("axialForce");
             }
         }
         public float MaxXcorr{

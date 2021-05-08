@@ -56,7 +56,7 @@ namespace MainWpfApp.ViewModels {
                 MarkerType = MarkerType.Circle,
                 ItemsSource = points,
                 IsDataPointSelectable = true,
-                TrackerFormatString = "序号: {X}\n测量时间: {TestTime}\n轴力: {Y} MPa\n时延: {TimeDelay} ns\n相似度: {MaxXcorr}"
+                TrackerFormatString = "序号: {X}\n测量时间: {TestTime}\n轴力: {Y} MPa\n时延: {timeDelay} ns\n相似度: {MaxXcorr}"
             };
             stressPlot.Series.Add(stressWave);
         }
@@ -135,8 +135,8 @@ namespace MainWpfApp.ViewModels {
                 var currentPlotModel = activeSeries.PlotModel;
                 ClearCurrentSelection(currentPlotModel);
                 MainWindow win = (MainWindow)Application.Current.MainWindow;
-                win.stressPlotModel.points.Remove(point);
-                win.stressPlotModel.stressPlot.InvalidatePlot(true);
+                win.StressPlotModel.points.Remove(point);
+                win.StressPlotModel.stressPlot.InvalidatePlot(true);
 
                 // db删除点
                 win.db.Delete<BoltLogModel>(point.Id);
@@ -172,7 +172,7 @@ namespace MainWpfApp.ViewModels {
                     MarkerFill = SelectedDataPointColor,
                     MarkerType = MarkerType,
                     ItemsSource = items,
-                    TrackerFormatString = "序号: {X}测量时间: {TestTime}\n轴力: {Y} MPa\n时延: {TimeDelay} ns\n相似度: {MaxXcorr}"
+                    TrackerFormatString = "序号: {X}测量时间: {TestTime}\n轴力: {Y} MPa\n时延: {timeDelay} ns\n相似度: {MaxXcorr}"
                 };
 
                 currentPlotModel.Series.Add(selectedSeries);

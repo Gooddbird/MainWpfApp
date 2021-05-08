@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 
-public class UTSMath
+public class BoltMath
     {
 
         /**************************参数***********************************/
@@ -80,8 +80,8 @@ public class UTSMath
                 //插值
                 double[] spl_zeroWaveData;
                 double[] spl_testWaveData;
-                spl_zeroWaveData = waveDataSplint(zeroWaveData, interTimes);
-                spl_testWaveData = waveDataSplint(testWaveData, interTimes);
+                spl_zeroWaveData = WaveDataSplint(zeroWaveData, interTimes);
+                spl_testWaveData = WaveDataSplint(testWaveData, interTimes);
                 // 时延估计
                 var TDETuple = GCCTDE(spl_zeroWaveData, spl_testWaveData, sampleTime / interTimes);
                 TDE = TDETuple.Item1;
@@ -98,8 +98,8 @@ public class UTSMath
                 //插值
                 double[] spl_zeroWaveData;
                 double[] spl_testWaveData;
-                spl_zeroWaveData = waveDataSplint(zeroWaveData, interTimes);
-                spl_testWaveData = waveDataSplint(testWaveData, interTimes);
+                spl_zeroWaveData = WaveDataSplint(zeroWaveData, interTimes);
+                spl_testWaveData = WaveDataSplint(testWaveData, interTimes);
                 // 时延估计
                 var TDETuple = FindPeakTDE(spl_zeroWaveData, spl_testWaveData, sampleTime / interTimes);
                 TDE = TDETuple.Item1;
@@ -201,7 +201,7 @@ public class UTSMath
          * L2范数
          * 
          */
-        public double normL2(double[] arr)
+        public double NormL2(double[] arr)
         {
             double normL2 = 0;
             for (int i=0;i<arr.Length;i++)
@@ -267,7 +267,7 @@ public class UTSMath
             //逆傅里叶变换
             Fourier.Inverse(xCorrFFT);
             abs_xCorr = new double[fftDataLen];
-            double scaling_factor = normL2(zeroWaveData) * normL2(testWaveData); //归一化缩放因子为2范数积
+            double scaling_factor = NormL2(zeroWaveData) * NormL2(testWaveData); //归一化缩放因子为2范数积
             for (int i = 0; i < fftDataLen; i++)
             {
                 abs_xCorr[i] = MathNet.Numerics.Complex32.Abs(xCorrFFT[i]) ;
@@ -351,7 +351,7 @@ public class UTSMath
             Fourier.Inverse(xCorrFFT);
             fftDataLen = fftDataLen * interTimes;
             abs_xCorr = new double[fftDataLen];
-            double scaling_factor = normL2(zeroWaveData) * normL2(testWaveData); //归一化缩放因子为2范数积
+            double scaling_factor = NormL2(zeroWaveData) * NormL2(testWaveData); //归一化缩放因子为2范数积
             for (int i = 0; i < fftDataLen; i++)
             {
                 abs_xCorr[i] = MathNet.Numerics.Complex32.Abs(xCorrFFT[i]);
@@ -405,7 +405,7 @@ public class UTSMath
         * @return waveData
         * 应力波形数据
         */
-        public double[] readCsvZeroWaveData(string CSVFileName)
+        public double[] ReadCsvZeroWaveData(string CSVFileName)
         {
             int waveLen = 0;
             String lineCSV;
@@ -475,7 +475,7 @@ public class UTSMath
          * @param filsname
          * 文件名
          */
-        public void writWaveDataToCSV(double[] waveData, String filsname)
+        public void WritWaveDataToCSV(double[] waveData, String filsname)
         {
             try
             {
@@ -503,7 +503,7 @@ public class UTSMath
         * @return splintWaveData
         * 插值后波形数据，数据长度 waveData.length*interTimes
         */
-        public double[] waveDataSplint(double[] waveData, int interTimes)
+        public double[] WaveDataSplint(double[] waveData, int interTimes)
         {
             int waveLen = waveData.Length;
             int waveLen_inter = (waveLen - 1) * interTimes;
@@ -527,7 +527,7 @@ public class UTSMath
         }
 
         /**取系统毫秒时（对应java的currentTimeMillis）*/
-        public static long currentTimeMills()
+        public static long CurrentTimeMills()
         {
             return (long)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1)).TotalMilliseconds);
         }
@@ -535,20 +535,20 @@ public class UTSMath
         /**
          * 插值时延估计测试
          */
-        public void testSplGCCTDE()
+        public void TestSplGCCTDE()
         {
 
             double sampleTime = 1; //采样间隔
             int interTimes = 64; //插值倍数
             Console.WriteLine("--------------------------------------------------------------------------");
             Console.WriteLine("------------------------------读取数据----------------------------------");
-            zeroWaveData = readCsvZeroWaveData(@"D:\CSharpWork\USTnetBolt\USTBolt_Server\SimWaveData8192.csv");
+            zeroWaveData = ReadCsvZeroWaveData(@"D:\CSharpWork\USTnetBolt\USTBolt_Server\SimWaveData8192.csv");
             Console.WriteLine("------------------------------生成模拟数据----------------------------------");
             testWaveData = SimuTestWaveData(zeroWaveData, 60);
             Console.WriteLine("------------------------------进行时延估计----------------------------------");
             while (true)
             {
-                long startTime = currentTimeMills();
+                long startTime = CurrentTimeMills();
                 // 插值时延估计
                 int waveLen = zeroWaveData.Length;
                 int spl_waveLen = waveLen * interTimes;
@@ -567,7 +567,7 @@ public class UTSMath
                 double timeDelay = TDETuple.Item1;
                 double[] abs_xCorr = TDETuple.Item2;
                 //获取运算时间
-                long stopTime = currentTimeMills();
+                long stopTime = CurrentTimeMills();
                 double timeCost = (stopTime - startTime);
                 Console.WriteLine("时延估计时间: " + timeDelay + "ms");
                 Console.WriteLine("时延估计运算时间: " + timeCost + "ms");
@@ -580,7 +580,7 @@ public class UTSMath
         /***********************主函数**************************/
         /*static void Main(string[] args)
         {
-            UTSMath utsMath = new UTSMath();
+            BoltMath utsMath = new BoltMath();
             utsMath.testSplGCCTDE();
         }*/
     }

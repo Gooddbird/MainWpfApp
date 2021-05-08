@@ -16,7 +16,7 @@ namespace MainWpfApp.ViewModels {
         private LinearAxis yAxisL;                      // 纵波纵坐标
         public MainWindow mainwin;                      // 主窗口
         public LineSeries LWave { get; set; }
-        public LineSeries zeroWave { get; set; }
+        public LineSeries ZeroWave { get; set; }
 
         public WavePlotModel() {
             mainwin = (MainWindow)Application.Current.MainWindow;
@@ -28,7 +28,7 @@ namespace MainWpfApp.ViewModels {
         /// </summary>
         public void Init() {
             // mainwin.TransversePlot.DataContext = mainwin.wavePlotModel;
-            mainwin.LongitudinalPlot.DataContext = mainwin.wavePlotModel;
+            mainwin.LongitudinalPlot.DataContext = mainwin.WavePlotModel;
             LWavePlotModel = new PlotModel();
             // TWavePlotModel = new PlotModel();
 
@@ -72,9 +72,9 @@ namespace MainWpfApp.ViewModels {
         /// </summary>
         public void PrintZeroStressWave() {
             // 纵波零力波形绘制
-            zeroWave = new LineSeries() { Title = "参考波形", InterpolationAlgorithm = InterpolationAlgorithms.CanonicalSpline };
+            ZeroWave = new LineSeries() { Title = "参考波形", InterpolationAlgorithm = InterpolationAlgorithms.CanonicalSpline };
 
-            LWavePlotModel.Series.Add(zeroWave);
+            LWavePlotModel.Series.Add(ZeroWave);
         }
 
         /// <summary>

@@ -23,9 +23,9 @@ namespace MainWpfApp {
         public BoltModel CurrentBolt { get; set; }                          // 当前选择螺栓项目
         public BoltLogModel CurrentBoltLog { get; set; }                    // 当前测量记录对
         public List<BoltModel> _BoltList = new List<BoltModel>();           // 螺栓列表
-        public WavePlotModel wavePlotModel { get; set; }
-        public StressPlotModel stressPlotModel { get; set; }
-        public USTBolt CurrentUstBolt; 
+        public WavePlotModel WavePlotModel { get; set; }
+        public StressPlotModel StressPlotModel { get; set; }
+        public Bolt CurrentBoltClient; 
         public bool IsLockWave = false;                                     // 是否锁定波形 默认为否
         public bool IsTesting = false;                                     // 是否正在测量
         public event PropertyChangedEventHandler PropertyChanged;
@@ -46,13 +46,13 @@ namespace MainWpfApp {
             InitPlotModel();
 
             //// 等待获取第一个波形数据
-            while (CurrentUstBolt.ustbData.IsCanStartCal == false) { };
+            while (CurrentBoltClient.boltData.IsCanStartCal == false) { };
             StartBtn.IsChecked = true;
 
             //progressWindow = new ProgressWindow();
             //progressWindow.ShowDialog();
             //Progress();
-            // window.ProgressBegin(CurrentUstBolt);
+            // window.ProgressBegin(CurrentBoltClient);
         }
 
 
@@ -61,7 +61,7 @@ namespace MainWpfApp {
         //    {
         //        for (int i = 0; i <= 100; i++)
         //        {
-        //            if (CurrentUstBolt.ustbData.IsCanStartCal == true)
+        //            if (CurrentBoltClient.boltData.IsCanStartCal == true)
         //            {
         //                progressWindow.progressBar1.Dispatcher.BeginInvoke((ThreadStart)delegate { progressWindow.progressBar1.Value = 100; });
         //                Thread.Sleep(1000);
@@ -85,8 +85,8 @@ namespace MainWpfApp {
             CurrentBolt = new BoltModel();
             Bolt_Para.DataContext = CurrentBolt;
             BuildBoltComboList(-1);
-            CurrentUstBolt = new USTBolt();
-            CurrentUstBolt.USTBDataInit();
+            CurrentBoltClient = new Bolt();
+            CurrentBoltClient.USTBDataInit();
             Proj_Name.DataContext = Proj_name;
 
             DateTime dateTime = DateTime.Now;
@@ -316,8 +316,8 @@ namespace MainWpfApp {
                 string start = startTime.ToString();
                 string end = endTime.ToString();
                 // 清除原来的点
-                stressPlotModel.points.Clear();
-                stressPlotModel.stressPlot.InvalidatePlot(true);
+                StressPlotModel.points.Clear();
+                StressPlotModel.stressPlot.InvalidatePlot(true);
                 string sql = string.Format(
                     "SELECT * FROM t_bolt_logs " +
                     "WHERE Bolt_id='{0}' " +
@@ -334,15 +334,15 @@ namespace MainWpfApp {
                 {
                     maxY = Math.Max(maxY, boltLog.AxialForce);
                     minY = Math.Min(minY, boltLog.AxialForce);
-                    stressPlotModel.points.Add(new StressLogPoint(index, boltLog.AxialForce, boltLog.TestTime, boltLog.TimeDelay, boltLog.MaxXcorr, boltLog.Id));
+                    StressPlotModel.points.Add(new StressLogPoint(index, boltLog.AxialForce, boltLog.TestTime, boltLog.TimeDelay, boltLog.MaxXcorr, boltLog.Id));
                     index++;
-                    stressPlotModel.stressPlot.InvalidatePlot(true);
+                    StressPlotModel.stressPlot.InvalidatePlot(true);
                 }
-                stressPlotModel.xAxis.Maximum = index + 10;
-                stressPlotModel.xAxis.Reset();
-                stressPlotModel.yAxis.Maximum = maxY + 400;
-                stressPlotModel.yAxis.Minimum = minY - 200;
-                stressPlotModel.yAxis.Reset();
+                StressPlotModel.xAxis.Maximum = index + 10;
+                StressPlotModel.xAxis.Reset();
+                StressPlotModel.yAxis.Maximum = maxY + 400;
+                StressPlotModel.yAxis.Minimum = minY - 200;
+                StressPlotModel.yAxis.Reset();
             }
             catch (SQLiteException)
             {
@@ -359,25 +359,25 @@ namespace MainWpfApp {
         /// 初始化波形
         /// </summary>
         private void InitPlotModel() {
-            wavePlotModel = new WavePlotModel();
-            wavePlotModel.Init();
-            stressPlotModel = new StressPlotModel();
-            stressPlotModel.Init();
+            WavePlotModel = new WavePlotModel();
+            WavePlotModel.Init();
+            StressPlotModel = new StressPlotModel();
+            StressPlotModel.Init();
         }
         
         /// <summary>
         /// 初始化 连接板卡 下发板卡参数 开启tcp线程从板卡获取实时波形数据 
         /// </summary>
         private void InitConnection() {
-            while (CurrentUstBolt.tcpConnFlag != 1) {
-                CurrentUstBolt.tcpConnect();
+            while (CurrentBoltClient.TcpConnFlag != 1) {
+                CurrentBoltClient.TcpConnect();
             }
             /*************连接板卡**************/
-            CurrentUstBolt.tcpConnectThreadStart();
+            CurrentBoltClient.TcpConnectThreadStart();
             // 开启UI线程
             StartUIThread();
             // 开启tcp线程获取板卡回送数据
-            CurrentUstBolt.tcpClientThreadStart();
+            CurrentBoltClient.TcpClientThreadStart();
             /*************写入参数**************/
         }
 
@@ -391,7 +391,7 @@ namespace MainWpfApp {
             Task.Factory.StartNew(() => {
                 while (true)
                 {
-                    if (CurrentUstBolt.tcpConnFlag == 0)
+                    if (CurrentBoltClient.TcpConnFlag == 0)
                     {
                         Thread.Sleep(5000);
                     }
@@ -400,19 +400,19 @@ namespace MainWpfApp {
                         // 注：子线程要获取主线程UI 需经过Dispacther.Invoke
                         Application.Current.Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Background,
                             new Action(() => {
-                                AxialForce.Text = CurrentUstBolt.ustbData.axialForce.ToString();
-                                TimeDelay.Text = CurrentUstBolt.ustbData.timeDelay.ToString();
-                                MaxXcorr.Text = CurrentUstBolt.ustbData.maxXcorr.ToString();
-                                CurrentUstBolt.ustbData.pulsWidt = Convert.ToDouble(pulsWidt.Text);
-                                CurrentUstBolt.ustbData.exciVolt = Convert.ToDouble(exciVolt.Text);
-                                CurrentUstBolt.ustbData.prf = Convert.ToDouble(prf.Text);
-                                CurrentUstBolt.ustbData.damping = Convert.ToDouble(damping.Text);
-                                CurrentUstBolt.ustbData.Ks= Convert.ToDouble(Ks.Text);
-                                CurrentUstBolt.ustbData.KT= Convert.ToDouble(KT.Text);
-                                CurrentUstBolt.ustbData.T0= Convert.ToDouble(ZeroTem.Text);
-                                CurrentUstBolt.ustbData.T1= Convert.ToDouble(TestTem.Text);
+                                AxialForce.Text = CurrentBoltClient.boltData.axialForce.ToString();
+                                TimeDelay.Text = CurrentBoltClient.boltData.timeDelay.ToString();
+                                MaxXcorr.Text = CurrentBoltClient.boltData.maxXcorr.ToString();
+                                CurrentBoltClient.boltData.pulsWidt = Convert.ToDouble(pulsWidt.Text);
+                                CurrentBoltClient.boltData.exciVolt = Convert.ToDouble(exciVolt.Text);
+                                CurrentBoltClient.boltData.prf = Convert.ToDouble(prf.Text);
+                                CurrentBoltClient.boltData.damping = Convert.ToDouble(damping.Text);
+                                CurrentBoltClient.boltData.Ks= Convert.ToDouble(Ks.Text);
+                                CurrentBoltClient.boltData.KT= Convert.ToDouble(KT.Text);
+                                CurrentBoltClient.boltData.T0= Convert.ToDouble(ZeroTem.Text);
+                                CurrentBoltClient.boltData.T1= Convert.ToDouble(TestTem.Text);
                             }));
-                        CurrentUstBolt.setPara();
+                        CurrentBoltClient.SetPara();
                         Thread.Sleep(1000);
                     }
                 }
@@ -458,9 +458,9 @@ namespace MainWpfApp {
             IsLockWave = false;
             LockWaveBtn.IsChecked = false;
             IsTesting = true;
-            CurrentUstBolt.ustbData.LWaveTDEStart = wavePlotModel.GetLWaveXStart();
-            CurrentUstBolt.ustbData.LWaveTEDEnd = wavePlotModel.GetLWaveXEnd();
-            CurrentUstBolt.StartStressCalThread();
+            CurrentBoltClient.boltData.LWaveTDEStart = WavePlotModel.GetLWaveXStart();
+            CurrentBoltClient.boltData.LWaveTEDEnd = WavePlotModel.GetLWaveXEnd();
+            CurrentBoltClient.StartStressCalThread();
         }
 
         private void StartBtn_Unchecked(object sender, RoutedEventArgs e) {
@@ -486,9 +486,9 @@ namespace MainWpfApp {
                     maxXcorr = Convert.ToDouble(MaxXcorr.Text);
                 }
                 else {
-                    force = CurrentUstBolt.ustbData.axialForce;
-                    timeDelay = CurrentUstBolt.ustbData.timeDelay;
-                    maxXcorr = CurrentUstBolt.ustbData.maxXcorr;
+                    force = CurrentBoltClient.boltData.axialForce;
+                    timeDelay = CurrentBoltClient.boltData.timeDelay;
+                    maxXcorr = CurrentBoltClient.boltData.maxXcorr;
                 }
 
                 // 插入记录到db
@@ -503,10 +503,10 @@ namespace MainWpfApp {
                 db.Insert(CurrentBoltLog, typeof(BoltLogModel));
 
                 // 绘制当前点
-                stressPlotModel.points.Add(new StressLogPoint(index, force, nowTime.ToString(), timeDelay, maxXcorr, CurrentBoltLog.Id));
+                StressPlotModel.points.Add(new StressLogPoint(index, force, nowTime.ToString(), timeDelay, maxXcorr, CurrentBoltLog.Id));
                 index++;
                 // stressPlotModel.stressWave.ItemsSource = stressPlotModel.points;
-                stressPlotModel.stressPlot.InvalidatePlot(true);
+                StressPlotModel.stressPlot.InvalidatePlot(true);
             }
             catch (SQLiteException)
             {
@@ -650,7 +650,7 @@ namespace MainWpfApp {
         //    InitConnection();
         //    InitPlotModel();
         //    // 等待获取第一个波形数据
-        //    //while (CurrentUstBolt.ustbData.IsCanStartCal == false) { };
+        //    //while (CurrentBoltClient.boltData.IsCanStartCal == false) { };
         //    //StartBtn.IsChecked = true;
 
         //}

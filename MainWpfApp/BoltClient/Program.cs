@@ -15,17 +15,17 @@ namespace USTBolt_Examp
         /***********************主函数**************************/
         //static void Main(string[] args)
         //{
-        //    USTBolt CurrentUstBolt = new USTBolt();
+        //    Bolt CurrentBoltClient = new Bolt();
         //    /*************初始化**************/
-        //    CurrentUstBolt.USTBDataInit();
+        //    CurrentBoltClient.USTBDataInit();
         //    /*************连接板卡**************/
         //    while (true)
         //    {
-        //        CurrentUstBolt.tcpConnect();
-        //        if (CurrentUstBolt.tcpConnFlag == 1)
+        //        CurrentBoltClient.TcpConnect();
+        //        if (CurrentBoltClient.TcpConnFlag == 1)
         //        {
-        //            CurrentUstBolt.setPara();
-        //            CurrentUstBolt.tcpClientThreadStart();
+        //            CurrentBoltClient.setPara();
+        //            CurrentBoltClient.TcpClientThreadStart();
         //            break;
         //        }
         //    }
@@ -33,16 +33,16 @@ namespace USTBolt_Examp
             
         //    /*************写入参数**************/
         //    //写入基准波形
-        //    double[] waveDataTmp = CurrentUstBolt.utsMath.readCsvZeroWaveData(@"D:\CSharpWork\USTnetBolt\USTBolt_Client\SimWaveData8178.csv");
-        //    Array.Copy(waveDataTmp, CurrentUstBolt.ustbData.lstuintZeroWaveDataBuff[0], waveDataTmp.Length);
-        //    Array.Copy(waveDataTmp, CurrentUstBolt.ustbData.lstuintZeroWaveDataBuff[1], waveDataTmp.Length);
-        //    //Array.Copy(waveDataTmp, 0, ustbClient.ustbData.lstuintZeroWaveDataBuff[2], 0, waveDataTmp.Length);
-        //    //Array.Copy(waveDataTmp, 0, ustbClient.ustbData.lstuintZeroWaveDataBuff[3], 0, waveDataTmp.Length);
+        //    double[] waveDataTmp = CurrentBoltClient.utsMath.readCsvZeroWaveData(@"D:\CSharpWork\USTnetBolt\USTBolt_Client\SimWaveData8178.csv");
+        //    Array.Copy(waveDataTmp, CurrentBoltClient.boltData.lstuintZeroWaveDataBuff[0], waveDataTmp.Length);
+        //    Array.Copy(waveDataTmp, CurrentBoltClient.boltData.lstuintZeroWaveDataBuff[1], waveDataTmp.Length);
+        //    //Array.Copy(waveDataTmp, 0, ustbClient.boltData.lstuintZeroWaveDataBuff[2], 0, waveDataTmp.Length);
+        //    //Array.Copy(waveDataTmp, 0, ustbClient.boltData.lstuintZeroWaveDataBuff[3], 0, waveDataTmp.Length);
         //    //
         //    /*************下发设置**************/
-        //    CurrentUstBolt.setPara();
+        //    CurrentBoltClient.setPara();
         //    /*************进行轴力计算**************/
-        //    CurrentUstBolt.StartStressCalThread();
+        //    CurrentBoltClient.StartStressCalThread();
 
         //    /*************模拟其他**************/
         //    long lastSysTime = currentTimeMills();
@@ -50,7 +50,7 @@ namespace USTBolt_Examp
         //    {
         //        if((currentTimeMills() - lastSysTime) > 5000)
         //        {
-        //            CurrentUstBolt.setPara();
+        //            CurrentBoltClient.setPara();
         //            lastSysTime = currentTimeMills();
         //        }
         //    }

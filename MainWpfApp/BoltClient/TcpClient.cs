@@ -18,12 +18,12 @@ public class TcpClient
         //public String ipStr = "192.168.31.235";  //服务器ip
         public String portStr = "5000";  //端口号
 
-        public int tcpConnFlag = 0; //tcp连接标志 0表示未连接 1表示连接
+        public int TcpConnFlag = 0; //tcp连接标志 0表示未连接 1表示连接
 
-        public void tcpConnect()
+        public void TcpConnect()
         {
                 try {
-                    //while (tcpConnFlag != 1)
+                    //while (TcpConnFlag != 1)
                     //{
                         socketsend = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
                         // socketsend.Blocking = false;
@@ -35,7 +35,7 @@ public class TcpClient
                         if (socketsend.Connected == true)
                         {
                             Console.WriteLine(socketsend.RemoteEndPoint + ": 连接成功!");
-                            tcpConnFlag = 1;
+                            TcpConnFlag = 1;
                             return;
                         }
                     //}
@@ -48,21 +48,21 @@ public class TcpClient
 
         }
 
-    public void tcpConnectThreadStart() {
-        Thread tcpCon = new Thread(tcpConnect);
+    public void TcpConnectThreadStart() {
+        Thread tcpCon = new Thread(TcpConnect);
         tcpCon.Start();
     }
 
         //开辟TCP线程
-        public void tcpClientThreadStart()
+        public void TcpClientThreadStart()
         {
-            tcpClientThread = new Thread(tcpThread);
+            tcpClientThread = new Thread(TcpThread);
             //tcpClientThread.IsBackground = true; //后台程序
             tcpClientThread.Start();
         }
         /************************以下为TCP线程**************************/
         //TCP线程
-        public void tcpThread()
+        public void TcpThread()
         {
             byte[] dataBuffer = new byte[1024 * 32];
             int dataBufferLen;
@@ -74,25 +74,25 @@ public class TcpClient
 
                 try
                 {
-                    tcpSendData(getDataByt);
+                    TcpSendData(getDataByt);
                     dataBufferLen = 0;
                     dataBufferLen = socketsend.Receive(dataBuffer); //阻塞连接
                     //接收到的数据长度为0时表示连接断开，跳出循环
                     if (dataBufferLen == 0)
                     {
-                        tcpConnFlag = 0;
+                        TcpConnFlag = 0;
                         Console.WriteLine("连接断开，正在重新连接!");
-                        tcpConnect();
+                        TcpConnect();
                     }
                     RecDataHandle(dataBuffer, dataBufferLen);
 
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine("tcpThread erro：" + e.Message);
+                    Console.WriteLine("TcpThread erro：" + e.Message);
                     Console.WriteLine("正在重新连接!");
-                    tcpConnFlag = 0;
-                    tcpConnect();
+                    TcpConnFlag = 0;
+                    TcpConnect();
 
                 }
                 Thread.Sleep(300);
@@ -111,7 +111,7 @@ public class TcpClient
         }
 
         //发送数据
-        public bool tcpSendData(byte[] sendByt)
+        public bool TcpSendData(byte[] sendByt)
         {
             try
             {
