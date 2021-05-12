@@ -220,7 +220,7 @@ public class Bolt : TcpClient
         bytesCMD[4] = (byte)(byteTmp);
         //波形采样深度
         //bytesCMD[5] = (byte)(boltData.dataDepth );
-        bytesCMD[5] = (byte)0x0A; //不可修改，默认16384个数据
+        bytesCMD[5] = (byte)0x00; //不可修改，默认16384个数据
         //阻抗
         if (boltData.damping == 400)
             byteTmp = (byte)0x00;
@@ -235,6 +235,7 @@ public class Bolt : TcpClient
             Console.WriteLine("设置全局参数失败");
             return false;
         }
+        Console.WriteLine("全局命令：" + Bytes2HexString(bytesCMD));
 
         Thread.Sleep(100);
         /********通道参数***********/
@@ -530,7 +531,7 @@ public class Bolt : TcpClient
             {
                 boltData.lstuintWaveDataBuff[ChInx][i] = 0;
             }
-            //boltData.lstuintWaveDataBuff[ChInx][i] = boltData.lstuintWaveDataBuff[ChInx][i] / 512 * 100; //转化为100%
+            boltData.lstuintWaveDataBuff[ChInx][i] = boltData.lstuintWaveDataBuff[ChInx][i] / 512 * 100; //转化为100%
         }
 
         getWaveSysTime = CurrentTimeMills(); //更新波形获取时间

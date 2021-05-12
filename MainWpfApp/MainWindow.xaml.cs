@@ -11,6 +11,7 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Navigation;
 using System.Timers;
+using OxyPlot;
 
 namespace MainWpfApp {
     /// <summary>
@@ -414,12 +415,13 @@ namespace MainWpfApp {
                                 CurrentBoltClient.boltData.exciVolt = Convert.ToDouble(exciVolt.Text);
                                 CurrentBoltClient.boltData.prf = Convert.ToDouble(prf.Text);
                                 CurrentBoltClient.boltData.damping = Convert.ToDouble(damping.Text);
+                                CurrentBoltClient.boltData.lstGain[0]= Convert.ToDouble(GainText.Text);
                                 CurrentBoltClient.boltData.Ks= Convert.ToDouble(Ks.Text);
                                 CurrentBoltClient.boltData.KT= Convert.ToDouble(KT.Text);
                                 CurrentBoltClient.boltData.T0= Convert.ToDouble(ZeroTem.Text);
                                 CurrentBoltClient.boltData.T1= Convert.ToDouble(TestTem.Text);
                             }));
-                       // CurrentBoltClient.SetPara();
+                        CurrentBoltClient.SetPara();
                         Thread.Sleep(1000);
                     }
                 }
@@ -456,18 +458,22 @@ namespace MainWpfApp {
         }
 
 
+        private void StartTest() {
+            IsLockWave = false;
+            //LockWaveBtn.IsChecked = false;
+            IsTesting = true;
+            CurrentBoltClient.boltData.LWaveTDEStart = WavePlotModel.GetLWaveXStart();
+            CurrentBoltClient.boltData.LWaveTEDEnd = WavePlotModel.GetLWaveXEnd();
+            CurrentBoltClient.StartStressCalThread();
+        }
+
         /// <summary>
         /// 开始测量按钮按下
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void StartBtn_Checked(object sender, RoutedEventArgs e) {
-            IsLockWave = false;
-            LockWaveBtn.IsChecked = false;
-            IsTesting = true;
-            CurrentBoltClient.boltData.LWaveTDEStart = WavePlotModel.GetLWaveXStart();
-            CurrentBoltClient.boltData.LWaveTEDEnd = WavePlotModel.GetLWaveXEnd();
-            CurrentBoltClient.StartStressCalThread();
+            StartTest();
         }
 
         private void StartBtn_Unchecked(object sender, RoutedEventArgs e) {
@@ -648,6 +654,35 @@ namespace MainWpfApp {
         private void RealtimeLogBtn_Unchecked(object sender, RoutedEventArgs e) {
             IsRealtimeLog = false;
             timer.Enabled = false;
+        }
+
+        private void SaveZeroBtn_Click(object sender, RoutedEventArgs e) {
+            Task.Factory.StartNew(() =>
+            {
+                WavePlotModel.ZeroWave.Points.Clear();
+                WavePlotModel.LWavePlotModel.InvalidatePlot(true);
+                int i = 0;
+                for (int t = 0; t < MaxSize; t++)
+                {
+                    CurrentBoltClient.boltData.lstuintZeroWaveDataBuff[0][t] = CurrentBoltClient.boltData.lstuintWaveDataBuff[0][t];
+                }
+                var zeroWaveList = CurrentBoltClient.boltData.lstuintZeroWaveDataBuff[0];
+                i = 0;
+                while (i < MaxSize)
+                {
+                    WavePlotModel.ZeroWave.Points.Add(new DataPoint(i, zeroWaveList[i]));
+                    i++;
+                    WavePlotModel.LWavePlotModel.InvalidatePlot(true);
+                }
+                CurrentBoltClient.boltData.LWaveTDEStart = WavePlotModel.GetLWaveXStart();
+                CurrentBoltClient.boltData.LWaveTEDEnd = WavePlotModel.GetLWaveXEnd();
+                if (IsTesting) {
+                    IsTesting = false;
+                    Thread.Sleep(300);
+                    StartTest();
+                }
+            }); 
+            
         }
 
         //private void ConnectBtn_Click(object sender, RoutedEventArgs e) {

@@ -43,6 +43,8 @@ namespace MainWpfApp.ViewModels {
                 TitlePosition = 0.5,
                 MinorGridlineStyle = LineStyle.Solid,
                 MajorGridlineStyle = LineStyle.Solid,
+                AbsoluteMaximum = 110,
+                AbsoluteMinimum = -110,
             };
             xAxisL = new LinearAxis()
             {
