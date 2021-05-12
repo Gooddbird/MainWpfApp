@@ -12,9 +12,9 @@ public class TcpClient
         NetworkStream clientStream;
         public MainWindow mainwin = (MainWindow)Application.Current.MainWindow;
 
-    //public String ipStr = "192.168.1.160";  //服务器ip
+    public String ipStr = "192.168.1.160";  //服务器ip
 
-    public String ipStr = "127.0.0.1";  //tcpserver ip 调式用 
+    //public String ipStr = "127.0.0.1";  //tcpserver ip 调式用 
         //public String ipStr = "192.168.31.235";  //服务器ip
         public String portStr = "5000";  //端口号
 
@@ -23,8 +23,11 @@ public class TcpClient
         public void TcpConnect()
         {
                 try {
-                    //while (TcpConnFlag != 1)
-                    //{
+                    if (TcpConnFlag == 1) {
+                        Thread.Sleep(3000);
+                    }
+                    if (TcpConnFlag != 1)
+                    {
                         socketsend = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
                         // socketsend.Blocking = false;
 
@@ -38,7 +41,7 @@ public class TcpClient
                             TcpConnFlag = 1;
                             return;
                         }
-                    //}
+                    }
                 
                 }
                 catch

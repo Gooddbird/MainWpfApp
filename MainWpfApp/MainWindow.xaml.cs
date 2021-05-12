@@ -91,8 +91,10 @@ namespace MainWpfApp {
 
             DateTime dateTime = DateTime.Now;
             DateTime start = dateTime.AddDays(-7);
-            EndDateCal.SelectedDate = dateTime;
-            EndTimeText.Text = dateTime.Year.ToString() + "-" + dateTime.Month.ToString() + "-" + dateTime.Day.ToString();
+            DateTime end = dateTime.AddDays(1);
+
+            EndDateCal.SelectedDate = end;
+            EndTimeText.Text = end.Year.ToString() + "-" + end.Month.ToString() + "-" + end.Day.ToString();
 
             StartDateCal.SelectedDate = start;
             StartTimeText.Text = start.Year.ToString() + "-" + start.Month.ToString() + "-" + start.Day.ToString();
@@ -212,6 +214,10 @@ namespace MainWpfApp {
         /// 保存功能 将数据保存至db文件
         /// </summary>
         private void SaveProjFun() {
+            if (Proj_path == null) {
+                MessageBox.Show("请先打开工程！");
+                return;
+            }
             try
             {
                 int i = BoltComboList.SelectedIndex;
@@ -313,10 +319,11 @@ namespace MainWpfApp {
             try
             {
                 index = 1;
-                string start = startTime.ToString();
-                string end = endTime.ToString();
+                string start = startTime.ToString("yyyy-MM-dd HH:mm:ss:ffff");
+                string end = endTime.ToString("yyyy-MM-dd HH:mm:ss:ffff");
                 // 清除原来的点
                 StressPlotModel.points.Clear();
+                StressPlotModel.stressWave.ClearSelection();
                 StressPlotModel.stressPlot.InvalidatePlot(true);
                 string sql = string.Format(
                     "SELECT * FROM t_bolt_logs " +
@@ -412,7 +419,7 @@ namespace MainWpfApp {
                                 CurrentBoltClient.boltData.T0= Convert.ToDouble(ZeroTem.Text);
                                 CurrentBoltClient.boltData.T1= Convert.ToDouble(TestTem.Text);
                             }));
-                        CurrentBoltClient.SetPara();
+                       // CurrentBoltClient.SetPara();
                         Thread.Sleep(1000);
                     }
                 }
@@ -498,13 +505,15 @@ namespace MainWpfApp {
                     AxialForce = (float)force,
                     TimeDelay = (float)timeDelay,
                     MaxXcorr = (float)maxXcorr,
-                    TestTime = nowTime.ToString()
+                    TestTime = nowTime.ToString("yyyy-MM-dd HH:mm:ss:ffff")
                 };
                 db.Insert(CurrentBoltLog, typeof(BoltLogModel));
 
                 // 绘制当前点
-                StressPlotModel.points.Add(new StressLogPoint(index, force, nowTime.ToString(), timeDelay, maxXcorr, CurrentBoltLog.Id));
+                StressPlotModel.points.Add(new StressLogPoint(index, force, nowTime.ToString("yyyy-MM-dd HH:mm:ss:ffff"), timeDelay, maxXcorr, CurrentBoltLog.Id));
                 index++;
+                StressPlotModel.yAxis.Maximum = force + 200;
+                StressPlotModel.yAxis.Reset();
                 // stressPlotModel.stressWave.ItemsSource = stressPlotModel.points;
                 StressPlotModel.stressPlot.InvalidatePlot(true);
             }

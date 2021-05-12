@@ -73,7 +73,6 @@ namespace MainWpfApp.ViewModels {
         public double TimeDelay { get; set; } // 时延
         public double MaxXcorr { get; set; } // 互相关系数 
         public int Id;                          // 数据库主键
-
         public StressLogPoint(double x, double y, string time,double timeDelay, double maxXcorr, int id) {
             X = x;
             Y = y;
@@ -82,7 +81,6 @@ namespace MainWpfApp.ViewModels {
             MaxXcorr = maxXcorr;
             Id = id;
         }
-
         public DataPoint GetDataPoint() {
             return new DataPoint(X, Y);
         }
@@ -172,7 +170,7 @@ namespace MainWpfApp.ViewModels {
                     MarkerFill = SelectedDataPointColor,
                     MarkerType = MarkerType,
                     ItemsSource = items,
-                    TrackerFormatString = "序号: {X}测量时间: {TestTime}\n轴力: {Y} MPa\n时延: {timeDelay} ns\n相似度: {MaxXcorr}"
+                    TrackerFormatString = "序号: {X}\n测量时间: {TestTime}\n轴力: {Y} MPa\n时延: {timeDelay} ns\n相似度: {MaxXcorr}"
                 };
 
                 currentPlotModel.Series.Add(selectedSeries);

@@ -145,7 +145,7 @@
             <StackPanel Orientation="Horizontal" Margin="40,0,0,0">
 
                 <TextBlock Text="相似度" FontSize="24" Padding="0" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                <TextBlock x:Name="MaxXcorr" TextTrimming="CharacterEllipsis" Text="0.000000000" TextAlignment="Center" Canvas.Left="40" Padding="0" UseLayoutRounding="True" Margin="10,0,0,0" FontSize="36" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black" Width="150" Background="#FFEAEAEA"/>
+                <TextBlock x:Name="MaxXcorr" Text="0.0000000" TextAlignment="Center" Canvas.Left="40" Padding="0" UseLayoutRounding="True" Margin="10,0,0,0" FontSize="36" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black" Width="180" Background="#FFEAEAEA"/>
             </StackPanel>
             <Border Background="#FF8152EA" Margin="20,10,0,10" Width="3" />
 
@@ -233,11 +233,11 @@
                         </Canvas>
                         <Canvas Width="280" Margin="0" Height="40">
                             <TextBlock Text="零应力温度(℃)  " FontWeight="Bold" FontSize="20" Padding="0,6" HorizontalAlignment="Left" Canvas.Left="0" Width="150" Height="40"/>
-                            <TextBox x:Name="ZeroTem" Text="0" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Background="{x:Null}" BorderBrush="#FF0C0B0B" BorderThickness="2" FontWeight="Bold" Width="130" Padding="0,6" Margin="0" HorizontalAlignment="Right" Canvas.Left="150" Height="36" FontSize="18"/>
+                            <TextBox x:Name="ZeroTem" Text="20" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Background="{x:Null}" BorderBrush="#FF0C0B0B" BorderThickness="2" FontWeight="Bold" Width="130" Padding="0,6" Margin="0" HorizontalAlignment="Right" Canvas.Left="150" Height="36" FontSize="18"/>
                         </Canvas>
                         <Canvas Width="280" Margin="0" Height="40">
                             <TextBlock Text="测试温度(℃)  " FontWeight="Bold" FontSize="20" Padding="0,6" HorizontalAlignment="Left" Canvas.Left="0" Width="150" Height="40"/>
-                            <TextBox x:Name="TestTem" Text="0" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Background="{x:Null}" BorderBrush="#FF0C0B0B" BorderThickness="2" FontWeight="Bold" Width="130" Padding="0,6" Margin="0" HorizontalAlignment="Right" Canvas.Left="150" Height="36" FontSize="18"/>
+                            <TextBox x:Name="TestTem" Text="20" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Background="{x:Null}" BorderBrush="#FF0C0B0B" BorderThickness="2" FontWeight="Bold" Width="130" Padding="0,6" Margin="0" HorizontalAlignment="Right" Canvas.Left="150" Height="36" FontSize="18"/>
                         </Canvas>
                     </StackPanel>
                 </TabItem>

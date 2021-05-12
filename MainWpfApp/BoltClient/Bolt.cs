@@ -362,7 +362,7 @@ public class Bolt : TcpClient
                 if ((CurrentTimeMills() - getWaveSysTime) > 3000) //波形数据停止更新3秒
                 {
                     // Console.WriteLine("波形数据停止更新");
-                    MessageBox.Show("波形数据停止更新！");
+                    //MessageBox.Show("波形数据停止更新！");
                     return;
                 }
 
@@ -371,7 +371,8 @@ public class Bolt : TcpClient
             else
             {
                 Console.WriteLine("StressCalThread: TCP断开连接");
-                MessageBox.Show("服务端已断开连接！");
+                //MessageBox.Show("板卡断开连接!", "提示", MessageBoxButton.OK, MessageBoxImage.None, MessageBoxResult.None, MessageBoxOptions.ServiceNotification);
+
                 // Thread.Sleep(1000);
                 return;
             }
@@ -379,111 +380,213 @@ public class Bolt : TcpClient
     }
 
     //接收数据处理函数
-    public override void RecDataHandle(byte[] mesBuffer, int bytesReadLen)
-    {
+    //public override void RecDataHandle(byte[] mesBuffer, int bytesReadLen)
+    //{
+    //    //从mesBuffer提取数据
+    //    byte[] bytesRead = new byte[bytesReadLen];
+    //    Array.Copy(mesBuffer, 0, bytesRead, 0, bytesReadLen);
+    //    int dataLen = 16384; //波形长度
+    //    int waveLen = (dataLen - 10 - 2 - 14 - 2) / 2;
+    //    if (bytesReadLen != dataLen) //验证波形长度
+    //    {
+    //        //Console.WriteLine("波形长度错误"); //调试用
+    //        return;
+    //    }
+
+    //    //处理数据
+    //    byte[] heardByte = {(byte) 0xfe, (byte) 0xfe,
+    //                        (byte) 0xfe, (byte) 0xfe,
+    //                        (byte) 0xfe, (byte) 0xfe,
+    //                        (byte) 0x00, (byte) 0x00,
+    //                        (byte) 0x00, (byte) 0x00}; //10字节
+
+    //    byte[] tipByte = { (byte)0xfe, (byte)0x02 }; //2字节
+    //    byte[] endByte = { (byte)0xfe, (byte)0x03 }; //2字节
+
+    //    byte[] bytesTmp = new byte[10];
+    //    byte[] bytesTmp1 = new byte[2];
+    //    byte[] bytesTmp2 = new byte[2];
+    //    Array.Copy(bytesRead, 0, bytesTmp, 0, 10);  //数据头
+    //    Array.Copy(bytesRead, (dataLen - 2 - 14 - 2), bytesTmp1, 0, 2); //tip位
+    //    Array.Copy(bytesRead, dataLen - 2, bytesTmp2, 0, 2); //结束位
+
+    //    /* **解析数据包*****/
+    //    if (EqualsArray(bytesTmp, heardByte) &&
+    //        EqualsArray(bytesTmp1, tipByte) &&
+    //        EqualsArray(bytesTmp2, endByte)) //验证数据头 tip位 和 结束位
+    //    {
+    //        int ChInx = boltData.currChInx - 1;
+    //        boltData.lstWaveDataLen[ChInx] = waveLen;
+    //        for (int i = 0; i < waveLen; i++) //解析数据
+    //        {
+    //            boltData.lstuintWaveDataBuff[ChInx][i] = bytesRead[i * 2 + 10] * 256 + bytesRead[i * 2 + 1 + 10] - 512;
+    //            //boltData.lstuintWaveDataBuff[ChInx][i] = boltData.lstuintWaveDataBuff[ChInx][i] / 512 * 100; //转化为100%
+    //        }
+            
+    //        /*  绘图 */ 
+    //        try
+    //        {
+    //            mainwin.WavePlotModel.LWave.Points.Clear();
+    //            int i = 0;
+    //            var LWaveList = boltData.lstuintWaveDataBuff[0];
+    //            while (true)
+    //            {
+    //                if (i == waveLen)
+    //                {
+    //                    break;
+    //                }
+    //                mainwin.WavePlotModel.LWave.Points.Add(new DataPoint(i, LWaveList[i]));
+    //                i++;
+    //            }
+    //            mainwin.WavePlotModel.LWavePlotModel.InvalidatePlot(true);
+
+    //            // 零应力波形绘制
+    //            if (IsZeroBuf == true)
+    //            {
+    //                for (int j = 0; j < ChNum; j++)
+    //                {
+    //                    for (int t = 0; t < waveLen; t++)
+    //                    {
+    //                        boltData.lstuintZeroWaveDataBuff[j][t] = boltData.lstuintWaveDataBuff[j][t];
+    //                    }
+    //                }
+    //                var zeroWaveList = boltData.lstuintZeroWaveDataBuff[0];
+    //                i = 0;
+    //                // mainwin.wavePlotModel.zeroWave.Points.Clear();
+    //                while (i < waveLen)
+    //                {
+    //                    mainwin.WavePlotModel.ZeroWave.Points.Add(new DataPoint(i, zeroWaveList[i]));
+    //                    i++;
+    //                }
+    //                mainwin.WavePlotModel.LWavePlotModel.InvalidatePlot(true);
+    //                IsZeroBuf = false;
+    //            }
+    //            boltData.IsCanStartCal = true;
+    //        }
+    //        catch (Exception) {
+    //            mainwin.WavePlotModel.LWave.Points.Clear();
+    //            mainwin.WavePlotModel.LWavePlotModel.InvalidatePlot(true);
+    //        }
+            
+    //        getWaveSysTime = CurrentTimeMills(); //更新波形获取时间
+    //        //其他操作 调试用
+    //        //Console.WriteLine("波形数据格式解析完成，更新时间：" + getWaveSysTime.ToString());
+    //        //writWaveDataToCSV(boltData.lstuintWaveDataBuff[ChInx],
+    //        //    "D:\\CSharpWork\\USTnetBolt\\USTBolt_Client\\WaveData滤波前.CSV");
+    //    }
+    //    else
+    //    {
+    //        //调试用
+    //        //Console.WriteLine("波形数据格式错误," +
+    //        //    "数据头：" + bytes2HexString(bytesTmp) +
+    //        //    "tip位：" + bytes2HexString(bytesTmp1) +
+    //        //    "结束位：" + bytes2HexString(bytesTmp2));
+    //        return;
+    //    }
+    //}
+
+    /// 接收数据处理函数 V2.0
+    public override void RecDataHandle(byte[] mesBuffer, int bytesReadLen) {
         //从mesBuffer提取数据
-        byte[] bytesRead = new byte[bytesReadLen];
-        Array.Copy(mesBuffer, 0, bytesRead, 0, bytesReadLen);
+        byte[] bytesRead = mesBuffer;
         int dataLen = 16384; //波形长度
         int waveLen = (dataLen - 10 - 2 - 14 - 2) / 2;
         if (bytesReadLen != dataLen) //验证波形长度
         {
-            //Console.WriteLine("波形长度错误"); //调试用
+            Console.WriteLine("波形长度错误,长度：" + bytesReadLen); //调试用
             return;
         }
 
         //处理数据
-        byte[] heardByte = {(byte) 0xfe, (byte) 0xfe,
-                            (byte) 0xfe, (byte) 0xfe,
-                            (byte) 0xfe, (byte) 0xfe,
-                            (byte) 0x00, (byte) 0x00,
-                            (byte) 0x00, (byte) 0x00}; //10字节
+        byte[] heardByte = {(byte) 0x00, (byte) 0x00,
+                            (byte) 0x00, (byte) 0x00}; //数据头 格式
 
-        byte[] tipByte = { (byte)0xfe, (byte)0x02 }; //2字节
-        byte[] endByte = { (byte)0xfe, (byte)0x03 }; //2字节
+        byte[] bytesTmp = new byte[heardByte.Length];
+        Array.Copy(bytesRead, 0, bytesTmp, 0, heardByte.Length);  //数据头
 
-        byte[] bytesTmp = new byte[10];
-        byte[] bytesTmp1 = new byte[2];
-        byte[] bytesTmp2 = new byte[2];
-        Array.Copy(bytesRead, 0, bytesTmp, 0, 10);  //数据头
-        Array.Copy(bytesRead, (dataLen - 2 - 14 - 2), bytesTmp1, 0, 2); //tip位
-        Array.Copy(bytesRead, dataLen - 2, bytesTmp2, 0, 2); //结束位
-
-        /* **解析数据包*****/
-        if (EqualsArray(bytesTmp, heardByte) &&
-            EqualsArray(bytesTmp1, tipByte) &&
-            EqualsArray(bytesTmp2, endByte)) //验证数据头 tip位 和 结束位
+        ///* *****数据头匹配***/
+        int offset = bytesTmp.Length; //读取波形数据 偏移量
+        while (!EqualsArray(bytesTmp, heardByte))
         {
-            int ChInx = boltData.currChInx - 1;
-            boltData.lstWaveDataLen[ChInx] = waveLen;
-            for (int i = 0; i < waveLen; i++) //解析数据
+            offset = offset + 2;
+            if (offset > dataLen / 2)
             {
-                boltData.lstuintWaveDataBuff[ChInx][i] = bytesRead[i * 2 + 10] * 256 + bytesRead[i * 2 + 1 + 10] - 512;
-                //boltData.lstuintWaveDataBuff[ChInx][i] = boltData.lstuintWaveDataBuff[ChInx][i] / 512 * 100; //转化为100%
+                //调试用
+                Console.WriteLine("波形数据格式错误: 未匹配到数据头");
+                return;
             }
-            
-            /*  绘图 */ 
-            try
+            Array.Copy(bytesRead, (offset - bytesTmp.Length), bytesTmp, 0, heardByte.Length);  //数据头
+        }
+
+        ///* **解析数据包*****/
+        int ChInx = boltData.currChInx - 1;
+        boltData.lstWaveDataLen[ChInx] = waveLen;
+
+        for (int i = 0; i < waveLen; i++) //解析数据
+        {
+            boltData.lstuintWaveDataBuff[ChInx][i] = bytesRead[i * 2 + offset] * 256 + bytesRead[i * 2 + 1 + offset] - 512;
+            //将异常数据,强制归零
+            if (Math.Abs(boltData.lstuintWaveDataBuff[ChInx][i]) > 512)
             {
-                mainwin.WavePlotModel.LWave.Points.Clear();
-                int i = 0;
-                var LWaveList = boltData.lstuintWaveDataBuff[0];
-                while (true)
+                boltData.lstuintWaveDataBuff[ChInx][i] = 0;
+            }
+            //boltData.lstuintWaveDataBuff[ChInx][i] = boltData.lstuintWaveDataBuff[ChInx][i] / 512 * 100; //转化为100%
+        }
+
+        getWaveSysTime = CurrentTimeMills(); //更新波形获取时间
+
+        //调试用
+        // Console.WriteLine("波形数据格式解析完成，更新时间：" + getWaveSysTime.ToString());
+
+        /*  绘图 */
+        try
+        {
+            mainwin.WavePlotModel.LWave.Points.Clear();
+            int i = 0;
+            var LWaveList = boltData.lstuintWaveDataBuff[0];
+            while (true)
+            {
+                if (i == waveLen)
                 {
-                    if (i == waveLen)
+                    break;
+                }
+                mainwin.WavePlotModel.LWave.Points.Add(new DataPoint(i, LWaveList[i]));
+                i++;
+            }
+            mainwin.WavePlotModel.LWavePlotModel.InvalidatePlot(true);
+
+            // 零应力波形绘制
+            if (IsZeroBuf == true)
+            {
+                for (int j = 0; j < ChNum; j++)
+                {
+                    for (int t = 0; t < waveLen; t++)
                     {
-                        break;
+                        boltData.lstuintZeroWaveDataBuff[j][t] = boltData.lstuintWaveDataBuff[j][t];
                     }
-                    mainwin.WavePlotModel.LWave.Points.Add(new DataPoint(i, LWaveList[i]));
+                }
+                var zeroWaveList = boltData.lstuintZeroWaveDataBuff[0];
+                i = 0;
+                // mainwin.wavePlotModel.zeroWave.Points.Clear();
+                while (i < waveLen)
+                {
+                    mainwin.WavePlotModel.ZeroWave.Points.Add(new DataPoint(i, zeroWaveList[i]));
                     i++;
                 }
                 mainwin.WavePlotModel.LWavePlotModel.InvalidatePlot(true);
-
-                // 零应力波形绘制
-                if (IsZeroBuf == true)
-                {
-                    for (int j = 0; j < ChNum; j++)
-                    {
-                        for (int t = 0; t < waveLen; t++)
-                        {
-                            boltData.lstuintZeroWaveDataBuff[j][t] = boltData.lstuintWaveDataBuff[j][t];
-                        }
-                    }
-                    var zeroWaveList = boltData.lstuintZeroWaveDataBuff[0];
-                    i = 0;
-                    // mainwin.wavePlotModel.zeroWave.Points.Clear();
-                    while (i < waveLen)
-                    {
-                        mainwin.WavePlotModel.ZeroWave.Points.Add(new DataPoint(i, zeroWaveList[i]));
-                        i++;
-                    }
-                    mainwin.WavePlotModel.LWavePlotModel.InvalidatePlot(true);
-                    IsZeroBuf = false;
-                }
-                boltData.IsCanStartCal = true;
+                IsZeroBuf = false;
             }
-            catch (Exception) {
-                mainwin.WavePlotModel.LWave.Points.Clear();
-                mainwin.WavePlotModel.LWavePlotModel.InvalidatePlot(true);
-            }
-            
-            getWaveSysTime = CurrentTimeMills(); //更新波形获取时间
-            //其他操作 调试用
-            //Console.WriteLine("波形数据格式解析完成，更新时间：" + getWaveSysTime.ToString());
-            //writWaveDataToCSV(boltData.lstuintWaveDataBuff[ChInx],
-            //    "D:\\CSharpWork\\USTnetBolt\\USTBolt_Client\\WaveData滤波前.CSV");
+            boltData.IsCanStartCal = true;
         }
-        else
+        catch (Exception)
         {
-            //调试用
-            //Console.WriteLine("波形数据格式错误," +
-            //    "数据头：" + bytes2HexString(bytesTmp) +
-            //    "tip位：" + bytes2HexString(bytesTmp1) +
-            //    "结束位：" + bytes2HexString(bytesTmp2));
-            return;
+            mainwin.WavePlotModel.LWave.Points.Clear();
+            mainwin.WavePlotModel.LWavePlotModel.InvalidatePlot(true);
         }
-    }
 
+
+
+    }
     /************************辅助方法**************************/
     /**判断byte[]数组是否相等*/
     public static bool EqualsArray(byte[] bt1, byte[] bt2)
