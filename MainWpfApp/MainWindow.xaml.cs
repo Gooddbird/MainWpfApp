@@ -35,6 +35,7 @@ namespace MainWpfApp {
         public string Proj_name;                                            // 工程名字
         public int index = 1;                                               // 当前测量结果横坐标
         public bool IsRealtimeLog = false;                                  // 是否实时测量
+        public bool PlotFlag = false;
         public System.Timers.Timer timer = new System.Timers.Timer();
         public ProgressWindow progressWindow;
 
@@ -659,6 +660,11 @@ namespace MainWpfApp {
         private void SaveZeroBtn_Click(object sender, RoutedEventArgs e) {
             Task.Factory.StartNew(() =>
             {
+                if (PlotFlag == true) {
+                    return;
+                }
+                IsLockWave = true;
+                PlotFlag = true;
                 WavePlotModel.ZeroWave.Points.Clear();
                 WavePlotModel.LWavePlotModel.InvalidatePlot(true);
                 int i = 0;
@@ -681,6 +687,8 @@ namespace MainWpfApp {
                     Thread.Sleep(300);
                     StartTest();
                 }
+                IsLockWave = false;
+                PlotFlag = false;
             }); 
             
         }
