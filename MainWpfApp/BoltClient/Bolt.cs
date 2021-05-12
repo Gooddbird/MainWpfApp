@@ -530,7 +530,7 @@ public class Bolt : TcpClient
             {
                 boltData.lstuintWaveDataBuff[ChInx][i] = 0;
             }
-            //boltData.lstuintWaveDataBuff[ChInx][i] = boltData.lstuintWaveDataBuff[ChInx][i] / 512 * 100; //转化为100%
+            boltData.lstuintWaveDataBuff[ChInx][i] = boltData.lstuintWaveDataBuff[ChInx][i] / 512 * 100; //转化为100%
         }
 
         getWaveSysTime = CurrentTimeMills(); //更新波形获取时间
